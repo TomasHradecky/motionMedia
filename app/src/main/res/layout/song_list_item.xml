@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:weightSum="1"
+    android:gravity="right">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:textSize="8pt"
+        android:text="No song name"
+        android:id="@+id/songNametextView"
+        tools:lines="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:textSize="6pt"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="No artist"
+        tools:lines="1"
+        android:id="@+id/artistNametextView"
+        android:layout_weight="1.04" />
+</LinearLayout>
