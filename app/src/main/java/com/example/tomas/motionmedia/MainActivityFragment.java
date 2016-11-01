@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,6 @@ public class MainActivityFragment extends Fragment {
             setSongDescription(song);
             setSongTime(song);
             songSeekBar.setClickable(true);
-
         }
 
 
@@ -89,8 +89,10 @@ public class MainActivityFragment extends Fragment {
                 setRandom(!getRandom());
                 if (isRandom){
                     randomButton.setShadowLayer(8,-1,2,Color.BLUE);
+                    Toast.makeText(getContext(), "Random play was activated", Toast.LENGTH_SHORT);
                 } else {
                     randomButton.setShadowLayer(8,-1,2,Color.WHITE);
+                    Toast.makeText(getContext(), "Random play was deactivated", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -101,8 +103,10 @@ public class MainActivityFragment extends Fragment {
                 setRepeat(!getRepeat());
                 if (isRepeat){
                     repeatButton.setShadowLayer(8,-1,2,Color.BLUE);
+                    Toast.makeText(getContext(), "Repeating was activated", Toast.LENGTH_SHORT);
                 } else {
                     repeatButton.setShadowLayer(8,-1,2,Color.WHITE);
+                    Toast.makeText(getContext(), "Repeating was deactivated", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -330,8 +334,6 @@ public class MainActivityFragment extends Fragment {
 
         }
     }
-
-
 
     @Override
     public void onAttach(Context context) {

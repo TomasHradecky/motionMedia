@@ -1,6 +1,8 @@
 package com.example.tomas.motionmedia;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,11 +49,13 @@ public class SongListAdapter extends BaseAdapter {
         TextView songName = (TextView) view.findViewById(R.id.songNametextView);
         TextView songArtist = (TextView) view.findViewById(R.id.artistNametextView);
 
-
-
         songName.setText(songList.get(position).getSongName());
+        songName.setMaxLines(1);
+        songName.setTextSize(14);
+        songName.setBackgroundColor(Color.rgb(189,189,189));
         songArtist.setText(songList.get(position).getSongArtist());
-
+        songArtist.setMaxLines(1);
+        songArtist.setTextSize(12);
         return view;
     }
 }

@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     public void goOnSongList() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, songListFragment );
+
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
