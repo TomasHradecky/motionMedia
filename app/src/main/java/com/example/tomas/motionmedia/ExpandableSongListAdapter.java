@@ -19,7 +19,6 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
     private static LayoutInflater inflater = null;
     private List<Object> songList = new ArrayList<>();
     private List<String> artistList = new ArrayList<>();
-    private ArrayList<String> parentItems;
     private ArrayList<Song> child;
 
     public ExpandableSongListAdapter (Context context, List<Object> songList, List<String> artistList) {
@@ -46,7 +45,8 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return null;
+        ArrayList <Song> child =(ArrayList<Song>) songList.get(groupPosition);
+        return child.get(childPosition);
     }
 
     @Override
@@ -72,9 +72,6 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
         }
         TextView artist = (TextView) view.findViewById(R.id.topItemNametextView);
         artist.setText(artistList.get(groupPosition));
-
-
-
         return view;
     }
 
@@ -91,20 +88,11 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
         song.setMaxLines(1);
         song.setTextSize(18);
         song.setText("      - " + child.get(childPosition).getSongName());
-
-
-
-        song.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         return view;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 }

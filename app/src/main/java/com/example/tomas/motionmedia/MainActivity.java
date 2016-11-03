@@ -2,21 +2,24 @@ package com.example.tomas.motionmedia;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SeekBar;
-
+import android.widget.Toast;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener, MainActivityFragment.GoOnSongListListener, SongListFragment.GoOnMainListener{
     private SongListFragment songListFragment = new SongListFragment();
     private MainActivityFragment mainFragment = new MainActivityFragment();
+    private SongsManager songsManager = new SongsManager();
+    private List<Song> actualPlaylist = new ArrayList<>();
+    private List<Object> objectSongList = new ArrayList<>();
+    private List<String> artistList = new ArrayList<>();
+    private List<Song> allSongList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         /**
          * Prepare container for fragments
@@ -35,11 +37,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
             }
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mainFragment).commit();
         }
-
-
-
-
-
     }
 
     @Override
@@ -55,12 +52,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
+        if (id == R.id.action_refresh){
+            songListFragment.refreshSongs();
+            Toast.makeText(getApplicationContext(), "List of songs in your device was actualized", Toast.LENGTH_LONG).show();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -88,19 +87,52 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     public void goOnSongList() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, songListFragment );
-
+        objectSongList = songsManager.getObjectSongList(getApplicationContext());
+        artistList = songsManager.getArtistsList();
+        allSongList = songsManager.getAllSongList();
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
-    public void goOnMain (Song song, List<Song> songList) {
+    public void goOnMain (Song song, List<Song> playList) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, mainFragment );
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        mainFragment.setSongList(songList);
-        //mainFragment.setSong(song);
-        mainFragment.setAnotherSong(songList.indexOf(song));
+        mainFragment.setPlayList(playList);
+        mainFragment.setAnotherSong(playList.indexOf(song));
         mainFragment.play(song.getSongPath());
+    }
+
+    public List<String> getArtistList() {
+        return artistList;
+    }
+
+    public void setArtistList(List<String> artistList) {
+        this.artistList = artistList;
+    }
+
+    public List<Object> getObjectSongList() {
+        return objectSongList;
+    }
+
+    public void setObjectSongList(List<Object> objectSongList) {
+        this.objectSongList = objectSongList;
+    }
+
+    public List<Song> getActualPlaylist() {
+        return actualPlaylist;
+    }
+
+    public void setActualPlaylist(List<Song> actualPlaylist) {
+        this.actualPlaylist = actualPlaylist;
+    }
+
+    public List<Song> getAllSongList() {
+        return allSongList;
+    }
+
+    public void setAllSongList(List<Song> allSongList) {
+        this.allSongList = allSongList;
     }
 }

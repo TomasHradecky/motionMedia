@@ -2,14 +2,11 @@ package com.example.tomas.motionmedia;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.media.AsyncPlayer;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,14 +32,13 @@ public class MainActivityFragment extends Fragment {
     private TextView songTimeCurent, songName, songArtist, songAlbum, songTimeEnd;
     private Boolean isRandom = false;
     private Boolean isRepeat = false;
-    private List<Song> songList = new ArrayList<Song>();
+    private List<Song> playList = new ArrayList<Song>();
     private Random random = new Random();
     private List<Integer> previousRandomValues = new ArrayList<Integer>();
     private int previousRandomValuesListCounter;
     private List<Integer> playedSongIndexList = new ArrayList<>();
     private SeekBar songSeekBar;
     private ImageView songImageView;
-    private AsyncPlayer asyncPlayer = new AsyncPlayer("");
     private  final Handler handler=new Handler();
 
     public MainActivityFragment() {
@@ -74,8 +69,6 @@ public class MainActivityFragment extends Fragment {
             setSongTime(song);
             songSeekBar.setClickable(true);
         }
-
-
         trackListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,13 +121,13 @@ public class MainActivityFragment extends Fragment {
                         previousRandomValuesListCounter--;
                     }
                 } else {
-                    int i = songList.indexOf(song);
+                    int i = playList.indexOf(song);
                     i--;
                     if (-1 < i){
                         setAnotherSong(i);
                         setSongDescription(getSong());
                     } else {
-                        i = songList.size() - 1;
+                        i = playList.size() - 1;
                         setAnotherSong(i);
                         setSongDescription(getSong());
                     }
@@ -243,8 +236,8 @@ public class MainActivityFragment extends Fragment {
             mediaPlayer.stop();
         }
         mediaPlayer.reset();
-        setSong(songList.get(i));
-        play(songList.get(i).getSongPath());
+        setSong(playList.get(i));
+        play(playList.get(i).getSongPath());
     }
 
     public void play (String path) {
@@ -269,7 +262,7 @@ public class MainActivityFragment extends Fragment {
             e.printStackTrace();
         }
         if (!isRepeat){
-            playedSongIndexList.add(songList.indexOf(getSong()));
+            playedSongIndexList.add(playList.indexOf(getSong()));
         }
     }
 
@@ -280,15 +273,15 @@ public class MainActivityFragment extends Fragment {
     public void nextSong () {
         if (isRandom && isRepeat) {
             int low = 0;
-            int high = songList.size();
+            int high = playList.size();
             int result = random.nextInt(high - low) + low;
             setAnotherSong(result);
             setSongDescription(getSong());
             refreshPreviousRandomValuesList(result);
         } else if (!isRandom && isRepeat) {
-            int i = songList.indexOf(song);
+            int i = playList.indexOf(song);
             i++;
-            if (i < songList.size() ){
+            if (i < playList.size() ){
                 setAnotherSong(i);
                 setSongDescription(getSong());
             } else {
@@ -297,12 +290,12 @@ public class MainActivityFragment extends Fragment {
                 setSongDescription(getSong());
             }
         } else if (!isRandom && !isRepeat) {
-            int i = songList.indexOf(getSong());
+            int i = playList.indexOf(getSong());
             i ++;
-            if (i < songList.size() && !playedSongIndexList.contains(i) ){
+            if (i < playList.size() && !playedSongIndexList.contains(i) ){
                 setAnotherSong(i);
                 setSongDescription(getSong());}
-            else if (i == songList.size() && !playedSongIndexList.contains(i)) {
+            else if (i == playList.size() && !playedSongIndexList.contains(i)) {
                 i=0;
                 setAnotherSong(i);
                 setSongDescription(getSong());
@@ -315,7 +308,7 @@ public class MainActivityFragment extends Fragment {
             }
         } else if (isRandom && !isRepeat) {
             int low = 0;
-            int high = songList.size();
+            int high = playList.size();
             int result = random.nextInt(high - low) + low;
             while (playedSongIndexList.contains(result)){
                 result = random.nextInt(high - low) + low;
@@ -363,7 +356,7 @@ public class MainActivityFragment extends Fragment {
         isRepeat = repeat;
         if (isRepeat){
             playedSongIndexList = new ArrayList<>();
-            playedSongIndexList.add(songList.indexOf(getSong()));
+            playedSongIndexList.add(playList.indexOf(getSong()));
         }
     }
 
@@ -378,11 +371,11 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    public List<Song> getSongList() {
-        return songList;
+    public List<Song> getPlayList() {
+        return playList;
     }
 
-    public void setSongList(List<Song> songList) {
-        this.songList = songList;
+    public void setPlayList(List<Song> playList) {
+        this.playList = playList;
     }
 }

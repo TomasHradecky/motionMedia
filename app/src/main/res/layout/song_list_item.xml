@@ -10,7 +10,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="12pt"
+        android:textColor="@android:color/black"
+        android:textSize="16pt"
         android:text="No song name"
         android:id="@+id/songNametextView"
         tools:lines="1"
@@ -23,6 +24,6 @@
         android:text="No artist"
         tools:lines="1"
         android:id="@+id/artistNametextView"
-        android:textSize="10pt"
+        android:textSize="14pt"
         />
 </LinearLayout>

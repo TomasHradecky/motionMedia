@@ -2,33 +2,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:id="@+id/songListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="45dp">
+        android:layout_height="60dp">
 
         <Button
             android:text="Artist"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/artistListButton"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.25"
+            tools:textSize="5pt"
+            android:maxLines="1"
+            android:textAllCaps="false" />
 
         <Button
             android:text="All songs"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/allSongListButton"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.25"
+            tools:textSize="5pt"
+            android:textAllCaps="false" />
+
+        <Button
+            android:text="Playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/actualSongListButton"
+            android:layout_weight="0.25"
+            tools:textSize="5pt"
+            android:maxLines="1"
+            android:textAllCaps="false" />
+
+        <Button
+            android:text="Skipped"
+            android:layout_width="wrap_content"
+            android:id="@+id/songForDelListButton"
+            android:layout_weight="0.25"
+            tools:textSize="5pt"
+            android:maxLines="1"
+            tools:textStyle="normal"
+            android:textAllCaps="false"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <ExpandableListView
         android:id="@+id/expandSongList"
         android:layout_width="match_parent"
-        android:layout_height="420dp" />
+        android:layout_height="match_parent"
+        android:clickable="true" />
+
     <ListView
         android:background="#BDBDBD"
         android:layout_width="wrap_content"

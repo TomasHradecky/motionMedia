@@ -51,11 +51,11 @@ public class SongListAdapter extends BaseAdapter {
 
         songName.setText(songList.get(position).getSongName());
         songName.setMaxLines(1);
-        songName.setTextSize(14);
+        songName.setTextSize(18);
         songName.setBackgroundColor(Color.rgb(189,189,189));
         songArtist.setText(songList.get(position).getSongArtist());
         songArtist.setMaxLines(1);
-        songArtist.setTextSize(12);
+        songArtist.setTextSize(16);
         return view;
     }
 }
