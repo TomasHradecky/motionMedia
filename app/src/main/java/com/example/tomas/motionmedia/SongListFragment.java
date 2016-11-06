@@ -3,17 +3,19 @@ package com.example.tomas.motionmedia;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import static com.example.tomas.motionmedia.R.id.songList;
 
 public class SongListFragment extends Fragment {
@@ -25,6 +27,9 @@ public class SongListFragment extends Fragment {
     private GoOnMainListener goOnMainListener;
     private View layout;
     private Button artistButton, allSongListButton, songsForDelButton, actualPlayListButton;
+    private Song chosenSong;
+    private ListView list;
+    private ExpandableListView expList;
 
 
     public SongListFragment() {
@@ -57,8 +62,8 @@ public class SongListFragment extends Fragment {
 
     public void setButtons (final LayoutInflater inflater, final ViewGroup container ) {
         artistButton.setEnabled(false);
-        final ExpandableListView expList = (ExpandableListView) layout.findViewById(R.id.expandSongList);
-        final ListView list = (ListView) layout.findViewById(songList);
+        expList = (ExpandableListView) layout.findViewById(R.id.expandSongList);
+        list = (ListView) layout.findViewById(songList);
         list.setVisibility(View.GONE);
         expList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -77,6 +82,7 @@ public class SongListFragment extends Fragment {
         });
 
         expList.setAdapter(new ExpandableSongListAdapter(getContext(), objectSongList, artistList));
+        registerForContextMenu(expList);
 
         artistButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +110,7 @@ public class SongListFragment extends Fragment {
                         return true;
                     }
                 });
+                registerForContextMenu(expList);
             }
         });
 
@@ -115,17 +122,20 @@ public class SongListFragment extends Fragment {
                 actualPlayListButton.setEnabled(true);
                 songsForDelButton.setEnabled(true);
                 expList.setVisibility(View.GONE);
-                list.setAdapter(new SongListAdapter(getContext(), allSongList));
+                SongListAdapter songListAdapter = new SongListAdapter(getContext(), allSongList);
+                list.setAdapter(songListAdapter);
                 list.setVisibility(View.VISIBLE);
                 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        SongListAdapter adapter = new SongListAdapter(getContext(), allSongList);
-                        Song song = (Song) adapter.getItem(position);
+                        SongListAdapter songListAdapter = new SongListAdapter(getContext(), allSongList);
+                        Song song = (Song) songListAdapter.getItem(position);
                         actualPlayList = allSongList;
                         goOnMainListener.goOnMain(song, allSongList);
                     }
                 });
+                registerForContextMenu(list);
+
             }
         });
         actualPlayListButton.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +156,7 @@ public class SongListFragment extends Fragment {
                         goOnMainListener.goOnMain(song, actualPlayList);
                     }
                 });
+                registerForContextMenu(list);
             }
         });
 
@@ -163,16 +174,64 @@ public class SongListFragment extends Fragment {
         });
     }
 
+    /**
+     * nutno dodělat refresh view
+     */
     public void refreshSongs () {
-        objectSongList = new ArrayList<>();
-        artistList = new ArrayList<>();
-        actualPlayList = new ArrayList<>();
-        allSongList = new ArrayList<>();
-        objectSongList = ((MainActivity)getActivity()).getObjectSongList();
-        artistList = ((MainActivity)getActivity()).getArtistList();
-        actualPlayList = ((MainActivity)getActivity()).getActualPlaylist();
-        allSongList =  ((MainActivity)getActivity()).getAllSongList();
+        ((MainActivity)getActivity()).refreshSongs();
+        //refresh view
     }
+    @Override
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(Menu.NONE, R.id.itemA, Menu.NONE, "Add to actual playlist");
+        menu.add(Menu.NONE, R.id.itemB, Menu.NONE, "Delete song");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = null;
+        boolean useExpList = false;
+        try {
+            info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+            useExpList = true;
+        }
+        if (!useExpList){
+            Song s;
+            switch (item.getItemId()) {
+                case R.id.itemA:
+                    s =(Song) (list.getAdapter().getItem((int)info.id));
+                    actualPlayList.add(s);
+                    return true;
+                case R.id.itemB:
+                    s =(Song) (list.getAdapter().getItem((int)info.id));
+                    File file = new File(s.getSongPath());
+                    file.delete();
+                    return true;
+            }
+        } else {
+            ExpandableListView.ExpandableListContextMenuInfo expInfo= (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
+            int groupPos = ExpandableListView.getPackedPositionGroup(expInfo.packedPosition);
+            int childPos = ExpandableListView.getPackedPositionChild(expInfo.packedPosition);
+
+            Song s;
+            switch (item.getItemId()) {
+                case R.id.itemA:
+                    s =(Song) (expList.getExpandableListAdapter().getChild(groupPos,childPos));
+                    actualPlayList.add(s);
+                    return true;
+                case R.id.itemB:
+                    s =(Song) (expList.getExpandableListAdapter().getChild(groupPos,childPos));
+                    File file = new File(s.getSongPath());
+                    file.delete();
+                    return true;
+            }
+        }
+        return super.onContextItemSelected(item);
+    }
+
 
     public interface GoOnMainListener {
         public void goOnMain(Song song, List<Song> songList);

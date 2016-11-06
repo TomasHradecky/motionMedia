@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -87,6 +88,7 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
         artist.setVisibility(View.GONE);
         song.setMaxLines(1);
         song.setTextSize(18);
+        song.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
         song.setText("      - " + child.get(childPosition).getSongName());
         return view;
     }

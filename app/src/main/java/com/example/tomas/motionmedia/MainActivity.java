@@ -87,9 +87,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     public void goOnSongList() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, songListFragment );
-        objectSongList = songsManager.getObjectSongList(getApplicationContext());
-        artistList = songsManager.getArtistsList();
-        allSongList = songsManager.getAllSongList();
+        if (objectSongList.isEmpty() || artistList.isEmpty() || allSongList.isEmpty()){
+            objectSongList = songsManager.getObjectSongList(getApplicationContext());
+            artistList = songsManager.getArtistsList();
+            allSongList = songsManager.getAllSongList();
+        }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -102,6 +104,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         mainFragment.setPlayList(playList);
         mainFragment.setAnotherSong(playList.indexOf(song));
         mainFragment.play(song.getSongPath());
+    }
+
+    public void refreshSongs () {
+        objectSongList = songsManager.getObjectSongList(getApplicationContext());
+        artistList = songsManager.getArtistsList();
+        allSongList = songsManager.getAllSongList();
     }
 
     public List<String> getArtistList() {

@@ -1,10 +1,15 @@
 package com.example.tomas.motionmedia;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +51,22 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
 
+    public static void filelist(File folder)
+    {
+       // File folder = new File("C:/");
+        File[] listOfFiles = folder.listFiles();
+        for (File file : listOfFiles)
+        {
+            if (file.isFile())
+            {
+                String[] filename = file.getName().split("\\.(?=[^\\.]+$)"); //split filename from it's extension
+                if(filename[1].endsWith(".jpg")) //matching defined filename
+                    System.out.println("File exist: "+filename[0]+"."+filename[1]); // match occures.Apply any condition what you need
+            }
+        }
+        System.out.print("asdad");
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,10 +87,48 @@ public class MainActivityFragment extends Fragment {
         songSeekBar = (SeekBar) layout.findViewById(R.id.songSeekBar);
         songImageView = (ImageView) layout.findViewById(R.id.imageView);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        //timeButton.setEnabled(preferences.getBoolean("timeBut", false));
+        randomButton.setActivated(preferences.getBoolean("random", false));
+        isRandom = preferences.getBoolean("random", false);
+        repeatButton.setActivated(preferences.getBoolean("repeat", false));
+        isRepeat = preferences.getBoolean("repeat", false);
+
+        if (isRandom){
+            randomButton.setShadowLayer(8,-1,2,Color.BLUE);
+        } else {
+            randomButton.setShadowLayer(8,-1,2,Color.WHITE);
+        }
+        if (isRepeat){
+            repeatButton.setShadowLayer(8,-1,2,Color.BLUE);
+        } else {
+            repeatButton.setShadowLayer(8,-1,2,Color.WHITE);
+        }
+
         if (song != null){
             setSongDescription(song);
             setSongTime(song);
             songSeekBar.setClickable(true);
+            String path = song.getSongPath();
+
+
+            File f = new File(path);
+            String parentPath= f.getParent();
+            filelist(new File(parentPath+"/"));
+            //parentPath = parentPath + "/*.mp3";
+
+            Bitmap bmp = BitmapFactory.decodeFile(parentPath);
+            int i = 0;
+            i++;
+            //songImageView.setImageBitmap();
+
+
+
+
+
+            //path.
         }
         trackListButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +148,10 @@ public class MainActivityFragment extends Fragment {
                     randomButton.setShadowLayer(8,-1,2,Color.WHITE);
                     Toast.makeText(getContext(), "Random play was deactivated", Toast.LENGTH_SHORT);
                 }
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("random", getRandom());
+                editor.commit();
             }
         });
 
@@ -101,6 +166,10 @@ public class MainActivityFragment extends Fragment {
                     repeatButton.setShadowLayer(8,-1,2,Color.WHITE);
                     Toast.makeText(getContext(), "Repeating was deactivated", Toast.LENGTH_SHORT);
                 }
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("repeat", getRepeat());
+                editor.commit();
             }
         });
 
@@ -132,6 +201,7 @@ public class MainActivityFragment extends Fragment {
                         setSongDescription(getSong());
                     }
                 }
+
             }
         });
 
@@ -160,7 +230,23 @@ public class MainActivityFragment extends Fragment {
 
             }
         });
+        setSharedPreferences();
         return layout;
+    }
+
+    /**
+     * Save data to sharedPreferences for next open
+     */
+    public void setSharedPreferences (){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("artist", songArtist.getText().toString());
+        editor.putString("name", songName.getText().toString());
+        editor.putString("album", songAlbum.getText().toString());
+        editor.putBoolean("random", getRandom());
+        editor.putBoolean("repeat", getRepeat());
+
+        editor.commit();
     }
 
     public void setPlayButton () {
@@ -202,6 +288,8 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+
+
     public void setSongTime (Song song){
         handler.post(new Runnable(){
             @Override
@@ -221,7 +309,7 @@ public class MainActivityFragment extends Fragment {
 
     public void setSongDescription (Song song){
         songName.setText("Song: " + song.getSongName());
-        songAlbum.setText( "Album: " + song.getSongArtist());
+        songAlbum.setText( "Album: " + song.getSongAlbum());
         songArtist.setText("Artist: " + song.getSongArtist());
         songSeekBar.setMax(mediaPlayer.getDuration()/1000);
         songTimeEnd.setText( String.format("%02d:%02d",
@@ -237,6 +325,7 @@ public class MainActivityFragment extends Fragment {
         }
         mediaPlayer.reset();
         setSong(playList.get(i));
+        setSharedPreferences();
         play(playList.get(i).getSongPath());
     }
 

@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.util.Log;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ public class SongsManager {
                     Log.i(TAG, "ID column index: " + String.valueOf(titleColumn));
 
                     Log.i("Final ", "ID: " + cur.getString(idColumn) + " Title: " + cur.getString(titleColumn) + "Path: " + cur.getString(filePathIndex));
-                    Song song = new Song(cur.getString(titleColumn),cur.getString(artistColumn), cur.getInt(durationColumn), cur.getString(filePathIndex));
+                    Song song = new Song(cur.getString(titleColumn),cur.getString(artistColumn), cur.getInt(durationColumn), cur.getString(filePathIndex), cur.getString(albumColumn));
                     allSongList.add(song);
                     if (!artistList.contains(song.getSongArtist())){
                         artistList.add(song.getSongArtist());
@@ -61,11 +63,11 @@ public class SongsManager {
                         childList.add(song);
                         objectSongList.add(childList);
                     } else {
-                            int i = artistList.indexOf(song.getSongArtist());
-                            childList = (ArrayList<Song>) objectSongList.get(i);
-                            childList.add(song);
-                            objectSongList.set(i,childList);
-                            childList = new ArrayList<>();
+                        int i = artistList.indexOf(song.getSongArtist());
+                        childList = (ArrayList<Song>) objectSongList.get(i);
+                        childList.add(song);
+                        objectSongList.set(i,childList);
+                        childList = new ArrayList<>();
                     }
                 } while (cur.moveToNext());
             }
@@ -73,14 +75,44 @@ public class SongsManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        objectSongList.add(childList);
+        if (!childList.isEmpty()) {
+            objectSongList.add(childList);
+        }
+
+
+        Collections.sort(objectSongList, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                ArrayList <Song> list1 =(ArrayList<Song>) o1;
+                ArrayList <Song> list2 =(ArrayList<Song>) o2;
+
+
+                return list1.get(0).getSongArtist().compareToIgnoreCase(list2.get(0).getSongArtist());
+
+
+                      //  ArrayList <Song> child =(ArrayList<Song>) songList.get(groupPosition);
+            }
+        });
+
         return objectSongList;
     }
 
     public List<String> getArtistsList (){
+        Collections.sort(artistList, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
         return artistList;
     }
 
-    public List<Song> getAllSongList() {return allSongList; }
-    }
-
+    public List<Song> getAllSongList() {
+        Collections.sort(allSongList, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongName().compareToIgnoreCase(o2.getSongName());
+            }
+        });
+        return allSongList; }
+}

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -53,9 +54,11 @@ public class SongListAdapter extends BaseAdapter {
         songName.setMaxLines(1);
         songName.setTextSize(18);
         songName.setBackgroundColor(Color.rgb(189,189,189));
+        songName.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         songArtist.setText(songList.get(position).getSongArtist());
         songArtist.setMaxLines(1);
         songArtist.setTextSize(16);
+        songArtist.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return view;
     }
 }

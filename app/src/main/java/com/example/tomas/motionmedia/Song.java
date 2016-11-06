@@ -10,12 +10,14 @@ public class Song {
     private String songArtist;
     private int songLength;
     private String songPath;
+    private String songAlbum;
 
-    public Song (String songName,String songArtist,int songLength, String songPath) {
+    public Song (String songName,String songArtist,int songLength, String songPath, String songAlbum) {
         this.songName = songName;
         this.songArtist = songArtist;
         this.songLength = songLength;
         this.songPath = songPath;
+        this.songAlbum = songAlbum;
     }
 
 
@@ -49,5 +51,13 @@ public class Song {
 
     public void setSongPath(String songPath) {
         this.songPath = songPath;
+    }
+
+    public String getSongAlbum() {
+        return songAlbum;
+    }
+
+    public void setSongAlbum(String songAlbum) {
+        this.songAlbum = songAlbum;
     }
 }
