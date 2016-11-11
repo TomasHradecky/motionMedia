@@ -5,6 +5,9 @@ package com.example.tomas.motionmedia;
  * Created by Tomas on 25.10.2016.
  */
 
+/**
+ * Class representing audio file in device storage(internal and external)
+ */
 public class Song {
     private String songName;
     private String songArtist;
@@ -12,6 +15,14 @@ public class Song {
     private String songPath;
     private String songAlbum;
 
+    /**
+     * constructor
+     * @param songName name of song
+     * @param songArtist artist of song
+     * @param songLength length of song in milliseconds
+     * @param songPath location of song in device
+     * @param songAlbum album of song
+     */
     public Song (String songName,String songArtist,int songLength, String songPath, String songAlbum) {
         this.songName = songName;
         this.songArtist = songArtist;

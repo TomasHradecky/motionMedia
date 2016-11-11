@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-
+/**
+ * Custom song list adapter for view row with song name and song artist
+ */
 public class SongListAdapter extends BaseAdapter {
     private Context context;
     private List<Song> songList;

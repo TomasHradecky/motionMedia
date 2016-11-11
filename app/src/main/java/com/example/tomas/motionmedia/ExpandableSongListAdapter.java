@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,9 @@ import java.util.List;
  * Created by Tomas on 31.10.2016.
  */
 
+/**
+ * Custom expandable list adapter for view artist name as top level and song names as sub level
+ */
 public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private static LayoutInflater inflater = null;

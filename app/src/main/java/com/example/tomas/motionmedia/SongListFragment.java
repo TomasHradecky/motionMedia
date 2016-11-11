@@ -27,11 +27,12 @@ public class SongListFragment extends Fragment {
     private GoOnMainListener goOnMainListener;
     private View layout;
     private Button artistButton, allSongListButton, songsForDelButton, actualPlayListButton;
-    private Song chosenSong;
     private ListView list;
     private ExpandableListView expList;
 
-
+    /**
+     * nonparametric constructor
+     */
     public SongListFragment() {
     }
 
@@ -50,7 +51,6 @@ public class SongListFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        final Context context = getContext();
         layout = inflater.inflate(R.layout.fragment_expandable_song_list, container, false);
         artistButton = (Button) layout.findViewById(R.id.artistListButton);
         allSongListButton = (Button) layout.findViewById(R.id.allSongListButton);
@@ -61,28 +61,47 @@ public class SongListFragment extends Fragment {
     }
 
     public void setButtons (final LayoutInflater inflater, final ViewGroup container ) {
-        artistButton.setEnabled(false);
         expList = (ExpandableListView) layout.findViewById(R.id.expandSongList);
         list = (ListView) layout.findViewById(songList);
-        list.setVisibility(View.GONE);
-        expList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                ExpandableSongListAdapter adapter = new ExpandableSongListAdapter(getContext(), objectSongList,artistList);
-                Song song = (Song) adapter.getChild(groupPosition, childPosition);
-                actualPlayList = new ArrayList<Song>();
-                int i = 0;
-                while (adapter.getChildrenCount(groupPosition) > i){
-                    actualPlayList.add((Song) adapter.getChild(groupPosition,i));
-                    i++;
+        if (!actualPlayList.isEmpty()){
+            actualPlayListButton.setEnabled(false);
+            allSongListButton.setEnabled(true);
+            artistButton.setEnabled(true);
+            songsForDelButton.setEnabled(true);
+            expList.setVisibility(View.GONE);
+            list.setAdapter(new SongListAdapter(getContext(), actualPlayList));
+            list.setVisibility(View.VISIBLE);
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    SongListAdapter adapter = new SongListAdapter(getContext(), actualPlayList);
+                    Song song = (Song) adapter.getItem(position);
+                    goOnMainListener.goOnMain(song, actualPlayList);
                 }
-                goOnMainListener.goOnMain(song, actualPlayList);
-                return true;
-            }
-        });
+            });
+            registerForContextMenu(list);
+        } else {
+            artistButton.setEnabled(false);
+            list.setVisibility(View.GONE);
+            expList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                    ExpandableSongListAdapter adapter = new ExpandableSongListAdapter(getContext(), objectSongList,artistList);
+                    Song song = (Song) adapter.getChild(groupPosition, childPosition);
+                    actualPlayList = new ArrayList<Song>();
+                    int i = 0;
+                    while (adapter.getChildrenCount(groupPosition) > i){
+                        actualPlayList.add((Song) adapter.getChild(groupPosition,i));
+                        i++;
+                    }
+                    goOnMainListener.goOnMain(song, actualPlayList);
+                    return true;
+                }
+            });
 
-        expList.setAdapter(new ExpandableSongListAdapter(getContext(), objectSongList, artistList));
-        registerForContextMenu(expList);
+            expList.setAdapter(new ExpandableSongListAdapter(getContext(), objectSongList, artistList));
+            registerForContextMenu(expList);
+        }
 
         artistButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,9 +198,11 @@ public class SongListFragment extends Fragment {
      */
     public void refreshSongs () {
         ((MainActivity)getActivity()).refreshSongs();
-        //refresh view
+        ((MainActivity)getActivity()).goOnSongList();
+
     }
-    @Override
+
+     @Override
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(Menu.NONE, R.id.itemA, Menu.NONE, "Add to actual playlist");

@@ -10,19 +10,19 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by Tomas on 25.10.2016.
- * Class for serching mp3 files in device.
+ * Created by Tomas Hradecky on 25.10.2016.
+ * Class for searching mp3 files in device.
  */
-
 public class SongsManager {
 
     // SDCard Path
-    private Song song;
     private List<Song> allSongList = new ArrayList<Song>();
     private List<Object> objectSongList = new ArrayList<>();
     private List<String> artistList = new ArrayList<>();
 
-    // Constructor
+    /**
+     *nonparametric constructor
+     */
     public SongsManager(){}
 
     public List<Object> getObjectSongList(Context context) {
@@ -35,13 +35,13 @@ public class SongsManager {
             Cursor cur = context.getContentResolver().query( MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
             if (cur == null) {
                 // Query failed...
-                Log.e(TAG, "Failed to retrieve music: cursor is null :-(");
+                //Log.e(TAG, "Failed to retrieve music: cursor is null :-(");
             }
             else if (!cur.moveToFirst()) {
                 // Nothing to query. There is no music on the device. How boring.
-                Log.e(TAG, "Failed to move cursor to first row (no query results).");
+                //Log.e(TAG, "Failed to move cursor to first row (no query results).");
             }else {
-                Log.i(TAG, "Listing...");
+               // Log.i(TAG, "Listing...");
                 // retrieve the indices of the columns where the ID, title, etc. of the song are
                 // add each song to mItems
                 do {
@@ -51,10 +51,9 @@ public class SongsManager {
                     int durationColumn = cur.getColumnIndex(MediaStore.Audio.Media.DURATION);
                     int idColumn = cur.getColumnIndex(MediaStore.Audio.Media._ID);
                     int filePathIndex = cur.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    Log.i(TAG, "Title column index: " + String.valueOf(titleColumn));
-                    Log.i(TAG, "ID column index: " + String.valueOf(titleColumn));
-
-                    Log.i("Final ", "ID: " + cur.getString(idColumn) + " Title: " + cur.getString(titleColumn) + "Path: " + cur.getString(filePathIndex));
+                    //Log.i(TAG, "Title column index: " + String.valueOf(titleColumn));
+                    //Log.i(TAG, "ID column index: " + String.valueOf(titleColumn));
+                   // Log.i("Final ", "ID: " + cur.getString(idColumn) + " Title: " + cur.getString(titleColumn) + "Path: " + cur.getString(filePathIndex));
                     Song song = new Song(cur.getString(titleColumn),cur.getString(artistColumn), cur.getInt(durationColumn), cur.getString(filePathIndex), cur.getString(albumColumn));
                     allSongList.add(song);
                     if (!artistList.contains(song.getSongArtist())){
@@ -79,18 +78,12 @@ public class SongsManager {
             objectSongList.add(childList);
         }
 
-
         Collections.sort(objectSongList, new Comparator<Object>() {
             @Override
             public int compare(Object o1, Object o2) {
                 ArrayList <Song> list1 =(ArrayList<Song>) o1;
                 ArrayList <Song> list2 =(ArrayList<Song>) o2;
-
-
                 return list1.get(0).getSongArtist().compareToIgnoreCase(list2.get(0).getSongArtist());
-
-
-                      //  ArrayList <Song> child =(ArrayList<Song>) songList.get(groupPosition);
             }
         });
 

@@ -106,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         mainFragment.play(song.getSongPath());
     }
 
+    /**
+     * Refresh list of all songs in device
+     */
     public void refreshSongs () {
         objectSongList = songsManager.getObjectSongList(getApplicationContext());
         artistList = songsManager.getArtistsList();

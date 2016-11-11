@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -20,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * Main fragment with music player features
  */
 public class MainActivityFragment extends Fragment {
     private GoOnSongListListener goOnSongListListener;
@@ -48,9 +46,16 @@ public class MainActivityFragment extends Fragment {
     private ImageView songImageView;
     private  final Handler handler=new Handler();
 
+    /**
+     * nonparametric constructor
+     */
     public MainActivityFragment() {
     }
 
+    /**
+     * method for locate images in music path
+     * @param folder
+     */
     public static void filelist(File folder)
     {
        // File folder = new File("C:/");
@@ -64,7 +69,6 @@ public class MainActivityFragment extends Fragment {
                     System.out.println("File exist: "+filename[0]+"."+filename[1]); // match occures.Apply any condition what you need
             }
         }
-        System.out.print("asdad");
     }
 
     @Override
@@ -77,7 +81,7 @@ public class MainActivityFragment extends Fragment {
         randomButton = (Button) layout.findViewById(R.id.randomButton);
         playButton = (Button) layout.findViewById(R.id.playButton);
         Button nextButton = (Button) layout.findViewById(R.id.nextButton);
-        Button previousButton = (Button) layout.findViewById(R.id.prevButton);
+        final Button previousButton = (Button) layout.findViewById(R.id.prevButton);
         Button trackListButton = (Button) layout.findViewById(R.id.trackListButton);
         songName = (TextView) layout.findViewById(R.id.songNameText);
         songTimeCurent = (TextView) layout.findViewById(R.id.timeText1);
@@ -90,7 +94,6 @@ public class MainActivityFragment extends Fragment {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = preferences.edit();
 
-        //timeButton.setEnabled(preferences.getBoolean("timeBut", false));
         randomButton.setActivated(preferences.getBoolean("random", false));
         isRandom = preferences.getBoolean("random", false);
         repeatButton.setActivated(preferences.getBoolean("repeat", false));
@@ -125,9 +128,6 @@ public class MainActivityFragment extends Fragment {
             //songImageView.setImageBitmap();
 
 
-
-
-
             //path.
         }
         trackListButton.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +152,7 @@ public class MainActivityFragment extends Fragment {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean("random", getRandom());
                 editor.commit();
+                previousButton.setEnabled(true);
             }
         });
 
@@ -178,18 +179,21 @@ public class MainActivityFragment extends Fragment {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isRandom) {
+                if (isRandom && previousRandomValues.size() != 0) {
                     if (previousRandomValuesListCounter - 1 > (- 1)){
                         setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter-1));
                         setSongDescription(getSong());
                         previousRandomValuesListCounter--;
                     } else {
                         previousRandomValuesListCounter = previousRandomValues.size() - 1;
-                        setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter-1));
+                        setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter));
                         setSongDescription(getSong());
                         previousRandomValuesListCounter--;
                     }
-                } else {
+                } else if (isRandom && previousRandomValues.size() == 0) {
+                    previousButton.setEnabled(false);
+                }
+                else if (!isRandom) {
                     int i = playList.indexOf(song);
                     i--;
                     if (-1 < i){
@@ -208,7 +212,8 @@ public class MainActivityFragment extends Fragment {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               nextSong();
+                nextSongButtonAction();
+                previousButton.setEnabled(true);
             }
         });
 
@@ -249,6 +254,9 @@ public class MainActivityFragment extends Fragment {
         editor.commit();
     }
 
+    /**
+     * Set play button preferences by status
+     */
     public void setPlayButton () {
         if (mediaPlayer.isPlaying()){
             playButton.setText("Pause");
@@ -266,6 +274,12 @@ public class MainActivityFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     playButton.setText("Pause");
+                    if (playList.isEmpty()){
+                        ((MainActivity)getActivity()).refreshSongs();
+                        playList = ((MainActivity)getActivity()).getAllSongList();
+                        nextSongButtonAction();
+                        setSongTime(getSong());
+                    }
                     mediaPlayer.start();
                     setPlayButton();
                 }
@@ -273,6 +287,10 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    /**
+     * Refreshing list contains previously generated random number which represent songs index in playlist
+     * @param nextVal next random value
+     */
     public void refreshPreviousRandomValuesList(int nextVal) {
         if (previousRandomValues.size() < 20) {
            previousRandomValues.add(nextVal);
@@ -289,7 +307,10 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-
+    /**
+     *Continuously setting song time in text views and progress in seek bar
+     * @param song currently playing song
+     */
     public void setSongTime (Song song){
         handler.post(new Runnable(){
             @Override
@@ -307,6 +328,10 @@ public class MainActivityFragment extends Fragment {
 
     }
 
+    /**
+     *Set artist, ablum and name of currently playing song
+     * @param song currently playing song
+     */
     public void setSongDescription (Song song){
         songName.setText("Song: " + song.getSongName());
         songAlbum.setText( "Album: " + song.getSongAlbum());
@@ -319,6 +344,10 @@ public class MainActivityFragment extends Fragment {
         ));
     }
 
+    /**
+     * Set next song for play
+     * @param i index of chosen song from playlist
+     */
     public void setAnotherSong (int i) {
         if (mediaPlayer.isPlaying()){
             mediaPlayer.stop();
@@ -329,6 +358,10 @@ public class MainActivityFragment extends Fragment {
         play(playList.get(i).getSongPath());
     }
 
+    /**
+     *Start play set song
+     * @param path path to song location
+     */
     public void play (String path) {
         if (mediaPlayer.isPlaying()){
             mediaPlayer.stop();
@@ -344,7 +377,7 @@ public class MainActivityFragment extends Fragment {
                 public void onCompletion(MediaPlayer mp) {
                     mediaPlayer.stop();
                     mediaPlayer.reset();
-                    nextSong();
+                    nextSongButtonAction();
                 }
             });
         }catch (Exception e) {
@@ -359,7 +392,10 @@ public class MainActivityFragment extends Fragment {
         public void goOnSongList();
     }
 
-    public void nextSong () {
+    /**
+     *Choose which next song is chosen (random and repeat or not)
+     */
+    public void nextSongButtonAction() {
         if (isRandom && isRepeat) {
             int low = 0;
             int high = playList.size();
