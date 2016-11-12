@@ -354,6 +354,8 @@ public class MainActivityFragment extends Fragment {
         }
         mediaPlayer.reset();
         setSong(playList.get(i));
+        ((MainActivity)getActivity()).setCurrentSong(getSong());
+        ((MainActivity)getActivity()).setCurrentSongIndex(playList.indexOf(getSong()));
         setSharedPreferences();
         play(playList.get(i).getSongPath());
     }

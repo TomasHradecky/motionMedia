@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private List<Object> objectSongList = new ArrayList<>();
     private List<String> artistList = new ArrayList<>();
     private List<Song> allSongList = new ArrayList<>();
+    private Song currentSong;
+    private int currentSongIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,5 +147,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     public void setAllSongList(List<Song> allSongList) {
         this.allSongList = allSongList;
+    }
+
+    public Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public void setCurrentSong(Song currentSong) {
+        this.currentSong = currentSong;
+    }
+
+    public int getCurrentSongIndex() {
+        return currentSongIndex;
+    }
+
+    public void setCurrentSongIndex(int currentSongIndex) {
+        this.currentSongIndex = currentSongIndex;
     }
 }

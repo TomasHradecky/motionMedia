@@ -34,7 +34,7 @@
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="ee78ed9b54e91cedaf5a5b62b7e0167f14e3a384">
+        sha1="499c645c98b38180caa146a0acff78e10b6b38a6">
         <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\pre-dexed\debug\instant-run_55e460fd762c8f86b7d72c3271f2de59fec708e6.jar" />
     </item>
     <item
@@ -295,7 +295,7 @@
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="a2d0d088d7eef5af4d6c3934e80315392cc067a9">
+        sha1="7b3664edd153216b79558b2fa2da2d276cdb438a">
         <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\pre-dexed\debug\instant-run-bootstrap_661eb7ef580e88bd764c47a676aee56238ca3c37.jar" />
     </item>
     <item

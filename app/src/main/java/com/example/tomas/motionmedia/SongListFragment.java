@@ -1,6 +1,7 @@
 package com.example.tomas.motionmedia;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
@@ -98,7 +99,6 @@ public class SongListFragment extends Fragment {
                     return true;
                 }
             });
-
             expList.setAdapter(new ExpandableSongListAdapter(getContext(), objectSongList, artistList));
             registerForContextMenu(expList);
         }
