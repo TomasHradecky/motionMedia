@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private List<Song> allSongList = new ArrayList<>();
     private Song currentSong;
     private int currentSongIndex;
+    private int xCoordinationSensitivity, yCoordinationSensitivity, zCoordinationSensitivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

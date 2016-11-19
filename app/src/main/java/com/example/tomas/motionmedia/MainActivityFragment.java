@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -25,15 +29,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static android.content.Context.SENSOR_SERVICE;
+
 
 /**
  * Main fragment with music player features
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements SensorEventListener {
     private GoOnSongListListener goOnSongListListener;
     private Song song;
     private MediaPlayer mediaPlayer = new MediaPlayer();
-    private Button playButton, randomButton, repeatButton;
+    private Button playButton, randomButton, repeatButton, previousButton;
     private TextView songTimeCurent, songName, songArtist, songAlbum, songTimeEnd;
     private Boolean isRandom = false;
     private Boolean isRepeat = false;
@@ -45,6 +51,8 @@ public class MainActivityFragment extends Fragment {
     private SeekBar songSeekBar;
     private ImageView songImageView;
     private  final Handler handler=new Handler();
+    private SensorManager sensorManager;
+    private double ax,ay,az;;
 
     /**
      * nonparametric constructor
@@ -76,12 +84,14 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View layout;
         layout =  inflater.inflate(R.layout.fragment_main, container, false);
+        sensorManager=(SensorManager)getActivity().getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
         repeatButton = (Button) layout.findViewById(R.id.repeatButton);
         randomButton = (Button) layout.findViewById(R.id.randomButton);
         playButton = (Button) layout.findViewById(R.id.playButton);
         Button nextButton = (Button) layout.findViewById(R.id.nextButton);
-        final Button previousButton = (Button) layout.findViewById(R.id.prevButton);
+        previousButton = (Button) layout.findViewById(R.id.prevButton);
         Button trackListButton = (Button) layout.findViewById(R.id.trackListButton);
         songName = (TextView) layout.findViewById(R.id.songNameText);
         songTimeCurent = (TextView) layout.findViewById(R.id.timeText1);
@@ -179,33 +189,7 @@ public class MainActivityFragment extends Fragment {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isRandom && previousRandomValues.size() != 0) {
-                    if (previousRandomValuesListCounter - 1 > (- 1)){
-                        setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter-1));
-                        setSongDescription(getSong());
-                        previousRandomValuesListCounter--;
-                    } else {
-                        previousRandomValuesListCounter = previousRandomValues.size() - 1;
-                        setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter));
-                        setSongDescription(getSong());
-                        previousRandomValuesListCounter--;
-                    }
-                } else if (isRandom && previousRandomValues.size() == 0) {
-                    previousButton.setEnabled(false);
-                }
-                else if (!isRandom) {
-                    int i = playList.indexOf(song);
-                    i--;
-                    if (-1 < i){
-                        setAnotherSong(i);
-                        setSongDescription(getSong());
-                    } else {
-                        i = playList.size() - 1;
-                        setAnotherSong(i);
-                        setSongDescription(getSong());
-                    }
-                }
-
+                previousSongButtonAction();
             }
         });
 
@@ -453,6 +437,60 @@ public class MainActivityFragment extends Fragment {
             }
 
         }
+    }
+
+    public void previousSongButtonAction () {
+        if (isRandom && previousRandomValues.size() != 0) {
+            if (previousRandomValuesListCounter - 1 > (- 1)){
+                setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter-1));
+                setSongDescription(getSong());
+                previousRandomValuesListCounter--;
+            } else {
+                previousRandomValuesListCounter = previousRandomValues.size() - 1;
+                setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter));
+                setSongDescription(getSong());
+                previousRandomValuesListCounter--;
+            }
+        } else if (isRandom && previousRandomValues.size() == 0) {
+            previousButton.setEnabled(false);
+        }
+        else if (!isRandom) {
+            int i = playList.indexOf(song);
+            i--;
+            if (-1 < i){
+                setAnotherSong(i);
+                setSongDescription(getSong());
+            } else {
+                i = playList.size() - 1;
+                setAnotherSong(i);
+                setSongDescription(getSong());
+            }
+        }
+    }
+
+    //motion controll code block
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
+            ax=event.values[0];
+            ay=event.values[1];
+            az=event.values[2];
+            if (ax > 18){
+                nextSongButtonAction();
+                System.out.println("NEXT");
+            }
+            if (ax < -18) {
+                previousSongButtonAction();
+                System.out.println("PREVIOUS");
+            }
+
+        }
+            //System.out.println(ax + " " + ay + " " + az);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     @Override
