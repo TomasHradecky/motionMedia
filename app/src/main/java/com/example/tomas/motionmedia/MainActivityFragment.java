@@ -37,6 +37,7 @@ import static android.content.Context.SENSOR_SERVICE;
  */
 public class MainActivityFragment extends Fragment implements SensorEventListener {
     private GoOnSongListListener goOnSongListListener;
+    private GoOnSettingsListener goOnSettingsListener;
     private Song song;
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private Button playButton, randomButton, repeatButton, previousButton;
@@ -376,6 +377,10 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
 
     public interface GoOnSongListListener {
         public void goOnSongList();
+    }
+
+    public interface GoOnSettingsListener {
+        public void goOnSettings ();
     }
 
     /**

@@ -12,9 +12,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener, MainActivityFragment.GoOnSongListListener, SongListFragment.GoOnMainListener{
+public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener, MainActivityFragment.GoOnSongListListener, MainActivityFragment.GoOnSettingsListener, SongListFragment.GoOnMainListener{
     private SongListFragment songListFragment = new SongListFragment();
     private MainActivityFragment mainFragment = new MainActivityFragment();
+    private SettingsFragment settingsFragment = new SettingsFragment();
     private SongsManager songsManager = new SongsManager();
     private List<Song> actualPlaylist = new ArrayList<>();
     private List<Object> objectSongList = new ArrayList<>();
@@ -107,6 +108,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         mainFragment.setPlayList(playList);
         mainFragment.setAnotherSong(playList.indexOf(song));
         mainFragment.play(song.getSongPath());
+    }
+    public void goOnSettings () {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, settingsFragment );
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     /**

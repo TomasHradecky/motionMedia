@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Switch
+        android:text="Use motion control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:id="@+id/motionControlSwitch"
+        android:textOff="Off"
+        android:textOn="On"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:text="Sensitivity in x axis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/motionControlSwitch"
+        android:layout_alignLeft="@+id/xAxisSeekBar"
+        android:layout_alignStart="@+id/xAxisSeekBar"
+        android:layout_marginTop="25dp"
+        android:id="@+id/xAxisTextView" />
+
+    <TextView
+        android:text="Sensitivity in y axis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/xAxisSeekBar"
+        android:layout_alignLeft="@+id/xAxisSeekBar"
+        android:layout_alignStart="@+id/xAxisSeekBar"
+        android:layout_marginTop="25dp"
+        android:id="@+id/yAxisTextView" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:id="@+id/seekBar2"
+        android:layout_below="@+id/yAxisTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:text="Sensitivity in 7 axis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/seekBar2"
+        android:layout_alignLeft="@+id/seekBar2"
+        android:layout_alignStart="@+id/seekBar2"
+        android:layout_marginTop="25dp"
+        android:id="@+id/zAxisTextView" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/zAxisTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/seekBar3"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/xAxisSeekBar"
+        android:layout_below="@+id/xAxisTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp" />
+
+    <Switch
+        android:text="Use detection of skipped songs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:id="@+id/skippedSongSwitch"
+        android:layout_below="@+id/seekBar3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textOff="Off"
+        android:textOn="On"/>
+
+</RelativeLayout>
