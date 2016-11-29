@@ -14,7 +14,9 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-
+/**
+ * fragment with settings of motion control sensitivity and skipped song detection
+ */
 public class SettingsFragment extends Fragment {
     private View layout;
     private SeekBar xSensitivitySeekBar, ySensitivitySeekBar, zSensitivitySeekBar;
@@ -37,6 +39,7 @@ public class SettingsFragment extends Fragment {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final SharedPreferences.Editor editor = preferences.edit();
 
+        //prepare components
         TextView xAxisDescription = (TextView) layout.findViewById(R.id.xAxisTextView);
         xSensitivitySeekBar = (SeekBar) layout.findViewById(R.id.xAxisSeekBar);
         xDefaultButton = (Button) layout.findViewById(R.id.defaultXButton);
@@ -54,6 +57,7 @@ public class SettingsFragment extends Fragment {
 
         final Switch skippedSongSwitch = (Switch) layout.findViewById(R.id.skippedSongSwitch);
 
+        //set prepared components
         motionControlSwitch.setChecked(preferences.getBoolean("motionControl", false));
         xSensitivitySeekBar.setEnabled(preferences.getBoolean("xSeekBar", false));
         xSensitivitySeekBar.setProgress(preferences.getInt("xProgress", ((MainActivity)getActivity()).getxCoordinationSensitivity()));
@@ -70,12 +74,11 @@ public class SettingsFragment extends Fragment {
         zValue.setText(String.valueOf(preferences.getInt("zProgress", ((MainActivity)getActivity()).getzCoordinationSensitivity())));
         zDefaultButton.setEnabled(preferences.getBoolean("zDefButton", false));
         skippedSongSwitch.setChecked(preferences.getBoolean("skippedSong", false));
-
+        
         motionControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 ((MainActivity)getActivity()).setUseMotionControl(true);
-
                 if ( motionControlSwitch.isChecked()){
                     xSensitivitySeekBar.setEnabled(true);
                     xDefaultButton.setEnabled(true);
