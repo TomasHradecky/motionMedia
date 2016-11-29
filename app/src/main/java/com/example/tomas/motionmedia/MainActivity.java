@@ -12,10 +12,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener, MainActivityFragment.GoOnSongListListener, MainActivityFragment.GoOnSettingsListener, SongListFragment.GoOnMainListener{
+public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener, MainActivityFragment.GoOnSongListListener, MainActivityFragment.GoOnSettingsListener, MainActivityFragment.GoOnHelpListener, SongListFragment.GoOnMainListener{
     private SongListFragment songListFragment = new SongListFragment();
     private MainActivityFragment mainFragment = new MainActivityFragment();
     private SettingsFragment settingsFragment = new SettingsFragment();
+    private HelpFragment helpFragment = new HelpFragment();
     private SongsManager songsManager = new SongsManager();
     private List<Song> actualPlaylist = new ArrayList<>();
     private List<Object> objectSongList = new ArrayList<>();
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private Song currentSong;
     private int currentSongIndex;
     private int xCoordinationSensitivity = 18, yCoordinationSensitivity = 18, zCoordinationSensitivity = 18;
+    private int currentArtistIndex;
     private boolean useMotionControl;
     private boolean skippedSong;
 
@@ -54,16 +56,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             goOnSettings();
             return true;
-        }
-        if (id == R.id.action_refresh){
+        } else if (id == R.id.action_refresh){
             try {
                 refreshSongs();
                 Toast.makeText(getApplicationContext(), "List of songs in your device was actualized", Toast.LENGTH_LONG).show();
@@ -71,7 +68,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                 e.printStackTrace();
                 Toast.makeText(getApplicationContext(), "No songs were found", Toast.LENGTH_LONG).show();
             }
+        } else if (id == R.id.action_help) {
+            goOnHelp();
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -95,15 +96,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     }
 
-    @Override
-    public void goOnSongList() {
+    /**
+     * Refresh list of all songs in device
+     */
+    public void refreshSongs () {
+        objectSongList = songsManager.getObjectSongList(getApplicationContext());
+        artistList = songsManager.getArtistsList();
+        allSongList = songsManager.getAllSongList();
+    }
+
+    /**
+     * transition to another fragment
+     */
+    public void goOnHelp ()  {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, songListFragment );
-        if (objectSongList.isEmpty() || artistList.isEmpty() || allSongList.isEmpty()){
-            objectSongList = songsManager.getObjectSongList(getApplicationContext());
-            artistList = songsManager.getArtistsList();
-            allSongList = songsManager.getAllSongList();
-        }
+        fragmentTransaction.replace(R.id.fragment_container, helpFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -124,14 +131,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         fragmentTransaction.commit();
     }
 
-    /**
-     * Refresh list of all songs in device
-     */
-    public void refreshSongs () {
-        objectSongList = songsManager.getObjectSongList(getApplicationContext());
-        artistList = songsManager.getArtistsList();
-        allSongList = songsManager.getAllSongList();
+    public void goOnSongList() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, songListFragment );
+        if (objectSongList.isEmpty() || artistList.isEmpty() || allSongList.isEmpty()){
+            objectSongList = songsManager.getObjectSongList(getApplicationContext());
+            artistList = songsManager.getArtistsList();
+            allSongList = songsManager.getAllSongList();
+        }
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
+
+    /**
+     * getters and setters for attributes
+     */
 
     public List<String> getArtistList() {
         return artistList;
@@ -220,4 +234,17 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     public void setSkippedSong(boolean skippedSong) {
         this.skippedSong = skippedSong;
     }
+
+    public int getCurrentArtistIndex() {
+        return currentArtistIndex;
+    }
+
+    public void setCurrentArtistIndex(int currentArtistIndex) {
+        this.currentArtistIndex = currentArtistIndex;
+    }
+
+    public SongListFragment getSongListFragment() {
+        return songListFragment;
+    }
+
 }

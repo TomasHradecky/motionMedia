@@ -4,13 +4,19 @@
     tools:context="com.example.tomas.motionmedia.MainActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_refresh"
-        android:orderInCategory="200"
-        android:title="Refresh"
+        android:orderInCategory="100"
+        android:title="Refresh songs"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_help"
+        android:title="Help"
+        android:orderInCategory="300"
         app:showAsAction="never"
         />
 

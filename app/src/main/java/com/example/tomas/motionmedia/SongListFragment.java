@@ -124,6 +124,7 @@ public class SongListFragment extends Fragment {
                             actualPlayList.add((Song) adapter.getChild(groupPosition,i));
                             i++;
                         }
+                        ((MainActivity)getActivity()).setCurrentArtistIndex(groupPosition);
                         goOnMainListener.goOnMain(song, actualPlayList);
                         return true;
                     }
@@ -192,13 +193,17 @@ public class SongListFragment extends Fragment {
         });
     }
 
-    /**
-     * nutno dodělat refresh view
-     */
-    public void refreshSongs () {
-        ((MainActivity)getActivity()).refreshSongs();
-        ((MainActivity)getActivity()).goOnSongList();
-
+    public void setNextArtistSonglist (int nextArtistIndex) {
+        ExpandableSongListAdapter adapter = new ExpandableSongListAdapter(getContext(), objectSongList,artistList);
+        Song song = (Song) adapter.getChild(nextArtistIndex, 0);
+        actualPlayList = new ArrayList<Song>();
+        int i = 0;
+        while (adapter.getChildrenCount(nextArtistIndex) > i){
+            actualPlayList.add((Song) adapter.getChild(nextArtistIndex,i));
+            i++;
+        }
+        ((MainActivity)getActivity()).setCurrentArtistIndex(nextArtistIndex);
+        goOnMainListener.goOnMain(song, actualPlayList);
     }
 
      @Override

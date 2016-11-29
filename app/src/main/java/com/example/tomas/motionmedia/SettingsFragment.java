@@ -74,7 +74,7 @@ public class SettingsFragment extends Fragment {
         zValue.setText(String.valueOf(preferences.getInt("zProgress", ((MainActivity)getActivity()).getzCoordinationSensitivity())));
         zDefaultButton.setEnabled(preferences.getBoolean("zDefButton", false));
         skippedSongSwitch.setChecked(preferences.getBoolean("skippedSong", false));
-        
+
         motionControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

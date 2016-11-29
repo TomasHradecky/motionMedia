@@ -38,6 +38,7 @@ import static android.content.Context.SENSOR_SERVICE;
 public class MainActivityFragment extends Fragment implements SensorEventListener {
     private GoOnSongListListener goOnSongListListener;
     private GoOnSettingsListener goOnSettingsListener;
+    private GoOnHelpListener goOnHelpListener;
     private Song song;
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private Button playButton, randomButton, repeatButton, previousButton;
@@ -383,6 +384,10 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         public void goOnSettings ();
     }
 
+    public interface GoOnHelpListener {
+        public void goOnHelp ();
+    }
+
     /**
      *Choose which next song is chosen (random and repeat or not)
      */
@@ -444,6 +449,14 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         }
     }
 
+    public void nextRandomSong () {
+        int low = 0;
+        int high = playList.size();
+        int result = random.nextInt(high - low) + low;
+        setAnotherSong(result);
+        setSongDescription(getSong());
+    }
+
     public void previousSongButtonAction () {
         if (isRandom && previousRandomValues.size() != 0) {
             if (previousRandomValuesListCounter - 1 > (- 1)){
@@ -473,24 +486,36 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         }
     }
 
-    //motion controll code block
+    public void nextRandomArtist () {
+        int nextArtistIndex = ((MainActivity)getActivity()).getCurrentArtistIndex() + 1;
+        SongListFragment songListFragment = ((MainActivity)getActivity()).getSongListFragment();
+        songListFragment.setNextArtistSonglist(nextArtistIndex);
+    }
+
+    //motion control code block
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             ax=event.values[0];
             ay=event.values[1];
             az=event.values[2];
-            if (ax > ((MainActivity)getActivity()).getxCoordinationSensitivity()){
+            if (ax > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
                 nextSongButtonAction();
-                System.out.println("NEXT");
             }
-            if (ax < -((MainActivity)getActivity()).getxCoordinationSensitivity()) {
+            if (ax < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
                 previousSongButtonAction();
-                System.out.println("PREVIOUS");
+            }
+
+            if (ay > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                nextRandomSong();
+            }
+            if (ay < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                nextRandomArtist();
             }
 
         }
             //System.out.println(ax + " " + ay + " " + az);
+//        System.out.println(ay);
     }
 
     @Override
@@ -502,6 +527,8 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     public void onAttach(Context context) {
         super.onAttach(context);
         goOnSongListListener = (GoOnSongListListener) context;
+        goOnSettingsListener = (GoOnSettingsListener) context;
+        goOnHelpListener = (GoOnHelpListener) context;
     }
 
     @Override
@@ -509,6 +536,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         super.onDetach();
         goOnSongListListener = null;
         goOnSettingsListener = null;
+        goOnHelpListener = null;
     }
 
     public Song getSong() {

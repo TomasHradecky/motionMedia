@@ -9,11 +9,12 @@
     android:background="#BDBDBD">
     <TextView
         android:layout_width="match_parent"
-        android:textSize="14pt"
+        android:textSize="10pt"
         android:text="No song name"
         android:id="@+id/topItemNametextView"
         tools:lines="1"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
         android:background="#BDBDBD"
         android:layout_weight="0.06"
         android:layout_height="70px" />
