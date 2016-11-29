@@ -480,11 +480,11 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
             ax=event.values[0];
             ay=event.values[1];
             az=event.values[2];
-            if (ax > 18){
+            if (ax > ((MainActivity)getActivity()).getxCoordinationSensitivity()){
                 nextSongButtonAction();
                 System.out.println("NEXT");
             }
-            if (ax < -18) {
+            if (ax < -((MainActivity)getActivity()).getxCoordinationSensitivity()) {
                 previousSongButtonAction();
                 System.out.println("PREVIOUS");
             }
@@ -508,6 +508,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     public void onDetach() {
         super.onDetach();
         goOnSongListListener = null;
+        goOnSettingsListener = null;
     }
 
     public Song getSong() {

@@ -23,7 +23,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private List<Song> allSongList = new ArrayList<>();
     private Song currentSong;
     private int currentSongIndex;
-    private int xCoordinationSensitivity, yCoordinationSensitivity, zCoordinationSensitivity;
+    private int xCoordinationSensitivity = 18, yCoordinationSensitivity = 18, zCoordinationSensitivity = 18;
+    private boolean useMotionControl;
+    private boolean skippedSong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +60,17 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            goOnSettings();
             return true;
         }
         if (id == R.id.action_refresh){
-            songListFragment.refreshSongs();
-            Toast.makeText(getApplicationContext(), "List of songs in your device was actualized", Toast.LENGTH_LONG).show();
+            try {
+                refreshSongs();
+                Toast.makeText(getApplicationContext(), "List of songs in your device was actualized", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "No songs were found", Toast.LENGTH_LONG).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -171,5 +179,45 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     public void setCurrentSongIndex(int currentSongIndex) {
         this.currentSongIndex = currentSongIndex;
+    }
+
+    public boolean isUseMotionControl() {
+        return useMotionControl;
+    }
+
+    public void setUseMotionControl(boolean useMotionControl) {
+        this.useMotionControl = useMotionControl;
+    }
+
+    public int getxCoordinationSensitivity() {
+        return xCoordinationSensitivity;
+    }
+
+    public void setxCoordinationSensitivity(int xCoordinationSensitivity) {
+        this.xCoordinationSensitivity = xCoordinationSensitivity;
+    }
+
+    public int getyCoordinationSensitivity() {
+        return yCoordinationSensitivity;
+    }
+
+    public void setyCoordinationSensitivity(int yCoordinationSensitivity) {
+        this.yCoordinationSensitivity = yCoordinationSensitivity;
+    }
+
+    public int getzCoordinationSensitivity() {
+        return zCoordinationSensitivity;
+    }
+
+    public void setzCoordinationSensitivity(int zCoordinationSensitivity) {
+        this.zCoordinationSensitivity = zCoordinationSensitivity;
+    }
+
+    public boolean isSkippedSong() {
+        return skippedSong;
+    }
+
+    public void setSkippedSong(boolean skippedSong) {
+        this.skippedSong = skippedSong;
     }
 }

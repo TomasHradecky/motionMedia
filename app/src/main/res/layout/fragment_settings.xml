@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,7 +8,7 @@
         android:text="Use motion control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="5dp"
         android:id="@+id/motionControlSwitch"
         android:textOff="Off"
         android:textOn="On"
@@ -18,45 +19,40 @@
         android:layout_marginLeft="20dp" />
 
     <TextView
-        android:text="Sensitivity in x axis"
+        android:text="Sensitivity in X axis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/motionControlSwitch"
         android:layout_alignLeft="@+id/xAxisSeekBar"
         android:layout_alignStart="@+id/xAxisSeekBar"
-        android:layout_marginTop="25dp"
-        android:id="@+id/xAxisTextView" />
-
-    <TextView
-        android:text="Sensitivity in y axis"
-        android:layout_width="wrap_content"
+        android:layout_marginTop="15dp"
+        android:id="@+id/xAxisTextView"
+        tools:text="Sensitivity in X axis"
+        />
+    <SeekBar
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/xAxisSeekBar"
-        android:layout_alignLeft="@+id/xAxisSeekBar"
-        android:layout_alignStart="@+id/xAxisSeekBar"
-        android:layout_marginTop="25dp"
-        android:id="@+id/yAxisTextView" />
+        android:id="@+id/xAxisSeekBar"
+        android:layout_below="@+id/xAxisTextView"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="20dp"
+        android:max="50"
+        />
 
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:id="@+id/seekBar2"
+        android:id="@+id/yAxisSeekBar"
         android:layout_below="@+id/yAxisTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp" />
-
-    <TextView
-        android:text="Sensitivity in 7 axis"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/seekBar2"
-        android:layout_alignLeft="@+id/seekBar2"
-        android:layout_alignStart="@+id/seekBar2"
-        android:layout_marginTop="25dp"
-        android:id="@+id/zAxisTextView" />
+        android:layout_marginLeft="20dp"
+        android:max="50"/>
 
     <SeekBar
         android:layout_width="match_parent"
@@ -64,34 +60,111 @@
         android:layout_below="@+id/zAxisTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/seekBar3"
+        android:id="@+id/zAxisSeekBar"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"
+        android:max="50" />
 
-    <SeekBar
-        android:layout_width="match_parent"
+    <Button
+        android:text="Default X sensitivity"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/xAxisSeekBar"
-        android:layout_below="@+id/xAxisTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="20dp"
+        android:id="@+id/defaultXButton"
+        android:layout_below="@+id/xAxisSeekBar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="2dp"
+        android:enabled="false"/>
+
+    <TextView
+        android:text="Sensitivity in y axis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/yAxisTextView"
+        tools:text="Sensitivity in Y axis"
+        android:layout_below="@+id/defaultXButton"
+        android:layout_alignRight="@+id/xAxisTextView"
+        android:layout_alignEnd="@+id/xAxisTextView"
+        android:layout_marginTop="10dp" />
+
+    <Button
+        android:text="Defualt Y sensitivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/yAxisSeekBar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/defaultYButton"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="2dp"
+        android:enabled="false"/>
+
+    <TextView
+        android:text="Sensitivity in Z axis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/zAxisTextView"
+        tools:text="Sensitivity in Z axis"
+        android:layout_below="@+id/defaultYButton"
+        android:layout_alignLeft="@+id/yAxisTextView"
+        android:layout_alignStart="@+id/yAxisTextView"
+        android:layout_marginTop="10dp"
+        />
+
+    <Button
+        android:text="Default Z sensitivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/zAxisSeekBar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="2dp"
+        android:id="@+id/defaultZButton"
+        android:layout_marginRight="20dp"
+        android:enabled="false"/>
 
     <Switch
         android:text="Use detection of skipped songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:id="@+id/skippedSongSwitch"
-        android:layout_below="@+id/seekBar3"
+        android:textOff="Off"
+        android:textOn="On"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/defaultZButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:textOff="Off"
-        android:textOn="On"/>
+        android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/xAxisTextView"
+        android:layout_alignRight="@+id/xAxisSeekBar"
+        android:layout_alignEnd="@+id/xAxisSeekBar"
+        android:id="@+id/xValue" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/xValue"
+        android:layout_alignStart="@+id/xValue"
+        android:id="@+id/yValue"
+        android:layout_alignTop="@+id/yAxisTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/zAxisTextView"
+        android:layout_alignLeft="@+id/yValue"
+        android:layout_alignStart="@+id/yValue"
+        android:id="@+id/zValue" />
+
 
 </RelativeLayout>
