@@ -54,8 +54,9 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     private ImageView songImageView;
     private  final Handler handler=new Handler();
     private SensorManager sensorManager;
-    private double ax,ay,az;;
-
+    private double ax, ay, az, gx, gy, gz, mx, my, mz, tmpAx, tmpAy, tmpAz, dAx, dAy, dAz, lAx, lAy, lAz;
+    private boolean counter, isGravity = false, isMagnetic = false, isLinearAccell = false;
+    private int c;
     /**
      * nonparametric constructor
      */
@@ -86,8 +87,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                              Bundle savedInstanceState) {
         final View layout;
         layout =  inflater.inflate(R.layout.fragment_main, container, false);
-        sensorManager=(SensorManager)getActivity().getSystemService(SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        prepareSensors();
 
         repeatButton = (Button) layout.findViewById(R.id.repeatButton);
         randomButton = (Button) layout.findViewById(R.id.randomButton);
@@ -486,6 +486,29 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         }
     }
 
+    public void prepareSensors () {
+        sensorManager=(SensorManager)getActivity().getSystemService(SENSOR_SERVICE);
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
+            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_NORMAL);
+            isGravity = true;
+
+        }
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
+            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+            isMagnetic = true;
+
+        }
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null){
+            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+            isLinearAccell = true;
+
+        } else {
+            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 20000000);
+        }
+    }
+
     public void nextRandomArtist () {
         int nextArtistIndex = ((MainActivity)getActivity()).getCurrentArtistIndex() + 1;
         SongListFragment songListFragment = ((MainActivity)getActivity()).getSongListFragment();
@@ -495,27 +518,111 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     //motion control code block
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            ax=event.values[0];
-            ay=event.values[1];
-            az=event.values[2];
-            if (ax > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
-                nextSongButtonAction();
+        if (isGravity){
+            //get data from gravity
+            if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
+                gx = event.values[0];
+                gy = event.values[1];
+                gz = event.values[2];
+                System.out.println("gravity" + gx + " " + gy  + " " + gz);
             }
-            if (ax < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                previousSongButtonAction();
-            }
-
-            if (ay > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                nextRandomSong();
-            }
-            if (ay < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                nextRandomArtist();
-            }
-
         }
-            //System.out.println(ax + " " + ay + " " + az);
-//        System.out.println(ay);
+        if (isMagnetic){
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                mx = event.values[0];
+                my = event.values[1];
+                mz = event.values[2];
+                //System.out.println("magnetic" + mx + " " + my  + " " + mz);
+            }
+        }
+        if (isLinearAccell) {
+            if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
+                lAx=event.values[0];
+                lAy=event.values[1];
+                lAz=event.values[2];
+                if (lAx > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
+                    nextSongButtonAction();
+                }
+                if (lAx < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    previousSongButtonAction();
+                }
+
+                if (lAy > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    nextRandomSong();
+                }
+                if (lAy < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    nextRandomArtist();
+                }
+            }
+
+        } else {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+                c++;
+                //System.out.println(c);
+                if (counter) {
+                    tmpAx=event.values[0];
+                    tmpAy=event.values[1];
+                    tmpAz=event.values[2];
+                } else {
+                    ax=event.values[0];
+                    ay=event.values[1];
+                    az=event.values[2];
+                }
+                counter=!counter;
+                dAx = tmpAx - ax;
+                dAy = tmpAy - ay;
+                dAz = tmpAz - az;
+                if (dAx < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
+                    //clearSensorData();
+                    nextSongButtonAction();
+                    delay();
+                    System.out.println("NEXT " + dAx);
+                }
+                if (dAx > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    //clearSensorData();
+                    previousSongButtonAction();
+                    delay();
+                    System.out.println("PREV " + dAx);
+                }
+
+                if (dAy < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    //clearSensorData();
+                    //nextRandomSong();
+                    //delay();
+                    //System.out.println("RANDOM");
+                }
+                if (dAy > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                    //clearSensorData();
+                    //nextRandomArtist();
+                    //delay();
+                    //System.out.println("ARTIST");
+                }
+                //System.out.println("accel" + dAx + " " + dAy + " " + dAz);
+                if (dAy > 3 || dAy < -3)
+                System.out.println(dAy);
+            }
+        }
+    }
+
+    public  void clearSensorData () {
+        tmpAx = 0;
+        ax = 0;
+        dAx = 0;
+        tmpAy = 0;
+        ay = 0;
+        dAy = 0;
+        tmpAz = 0;
+        az = 0;
+        dAz = 0;
+    }
+
+    public void delay () {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

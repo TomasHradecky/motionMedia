@@ -70,5 +70,6 @@
         android:fastScrollEnabled="true"
         android:clickable="true"
         android:scrollIndicators="right"
+        tools:listitem=""
         />
 </LinearLayout>
