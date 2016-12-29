@@ -2,157 +2,175 @@
 <items version="2" >
 
     <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-24.2.1_12a37b0456008ed58e85534cfdce05cac7838524.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_b1753e91a9b1dedd6b3bf9b3a69b1ba56022d2a9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-animated-vector-drawable-24.2.1_ebc659a0fb99bff335846068baa26007fdda3062.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-24.2.1_818aafa12490af977583e80b09fda09c79029ac9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/design/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="e03f47f3d1017a093bb3239d4ec47c3447f40744">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-design-24.2.1_1da5de53631b92b8fe27803fc6750bb197d9cb6b.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-fragment-24.2.1_3c37460a62d97f6e740a20603edaea6169d2c216.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_e28c9983280cf19344a5de8eb2d239c506d033cc.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-ui-24.2.1_6fe772c12fe2d798270a6f030b3fb6d2295382f9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-compat-24.2.1_dcdb5dd04a7f8c6d964e4237036d80c7d717affb.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-24.2.1_c978d2b36801d473fa707c5833b3bbc1d63f3631.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="867dad63c33388ff8c7644b236579355036d075f">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_d3236f56e1ff0ba710a403fa84d9ae2b07f57c23.jar" />
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_495b3ef1958187e69ad5f5bcbc024c626709f118\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/root/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.1/support-annotations-24.2.1.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.1\jars\classes.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/support-annotations-24.2.1_bc102048a27ff00c8e10fc3a76afaa77fbe3d1bd.jar" />
+        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-24.2.1_0f8229125e71df93c239f2ae58d49cd4f6c6fc7e\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.1/jars/classes.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-24.2.1_e9a9c4a131bf3feada2ad786872374e73318185c.jar" />
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_0b1367a48bfc0e2a53d329257631a13e03d265ff\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-recyclerview-v7-24.2.1_93bf388708b580c77b50eb903359606317b1ce8e.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_ed428216de4de731572cc46a3b54a4e1b7e0ccf3.jar" />
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_21c17f263559c1c8f790069a00115ada4274ec12\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_68cb9b51d95736d17bcd1f1d8b8d9c28b9ddeac5.jar" />
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_66876c75d5e3d7cbc68765c396acd6218137b206\classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.1/jars/classes.jar"
-        jumboMode="false"
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-24.2.1_b5d50798a60292f4f9ed6f2c6e4232cf5a47dd7d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\design\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="e03f47f3d1017a093bb3239d4ec47c3447f40744">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-design-24.2.1_8aba51e9b2db0e74e01c6748220a42810d107fb0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c9f7229234e93c94b1fd0d4e3edf29e8c0738bc5">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_55e460fd762c8f86b7d72c3271f2de59fec708e6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="687b0e2e171202b95fef514aacb9841d4a6544c8">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_661eb7ef580e88bd764c47a676aee56238ca3c37\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-24.2.1_5a038b5d2e67503d31792624848c1a22cd05af00\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-24.2.1_311c959d8155407846ec95162a9b4eb471247486\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-24.2.1_6718741c0a7759a0fbff12abff45031e082c8cd3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_8f72c5cdd1262ad0e95225619e78e89f9301ebe3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-24.2.1_6d0aa1f53414397096bf52c779f057a0a5636cff\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-24.2.1_381a4c113944e3c76e8f3c967db85f5ec2bad0b6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.1\jars\classes.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="d5c731fc64c03dfe04d51134955b483551c35849">
-        <dex dex="/home/tomas/AndroidStudioProjects/cloned/motionMedia/app/build/intermediates/pre-dexed/debug/com.android.support-support-vector-drawable-24.2.1_4a9973f7281cc8dd6715b148cdbb95f112280b01.jar" />
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-24.2.1_aa60296e2e826c6b3721004b0b7f838055a24783\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.1_f559c1de3a191f545c1070182845a180c5429b90\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\Android_sdk\extras\android\m2repository\com\android\support\support-annotations\24.2.1\support-annotations-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-24.2.1_9a51e14e72986e0b47490534c17547b3c1ebf299\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-24.2.1_8aa28ca01a0d02cfee0bbd694fe74889a6e549b2\classes.dex" />
     </item>
 
 </items>

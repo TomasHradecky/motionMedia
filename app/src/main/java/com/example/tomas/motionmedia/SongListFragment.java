@@ -1,8 +1,12 @@
 package com.example.tomas.motionmedia;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,7 +18,10 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import static com.example.tomas.motionmedia.R.id.songList;
 
@@ -188,7 +195,13 @@ public class SongListFragment extends Fragment {
                 artistButton.setEnabled(true);
                 expList.setVisibility(View.GONE);
                 list.setVisibility(View.VISIBLE);
-                list.setAdapter(new SongListAdapter(getContext(), songForDelList));
+                songForDelList = ((MainActivity)getActivity()).getDb().getSongsForDel();
+                if (songForDelList.isEmpty()){
+                    songForDelList = new ArrayList<Song>();
+                    list.setAdapter(new SongListAdapter(getContext(), songForDelList));
+                } else {
+                    list.setAdapter(new SongListAdapter(getContext(), songForDelList));
+                }
             }
         });
     }
@@ -256,6 +269,8 @@ public class SongListFragment extends Fragment {
         }
         return super.onContextItemSelected(item);
     }
+
+
 
 
     public interface GoOnMainListener {

@@ -392,6 +392,8 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
      *Choose which next song is chosen (random and repeat or not)
      */
     public void nextSongButtonAction() {
+        Database db = ((MainActivity)getActivity()).getDb();
+        db.markSkippedSong(getSong().getSongPath());
         if (isRandom && isRepeat) {
             int low = 0;
             int high = playList.size();

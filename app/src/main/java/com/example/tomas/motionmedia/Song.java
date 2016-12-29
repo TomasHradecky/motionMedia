@@ -31,6 +31,13 @@ public class Song {
         this.songAlbum = songAlbum;
     }
 
+    /**
+     * nonparametric constructor
+     */
+    public Song (){
+
+    }
+
 
     public String getSongName() {
         return songName;

@@ -65,16 +65,6 @@
         android:layout_alignParentEnd="true"
         tools:lines="1" />
 
-    <Button
-        android:text="play"
-        android:layout_height="80px"
-        android:id="@+id/playButton"
-        tools:background="@android:color/darker_gray"
-        android:textSize="10sp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_width="90px" />
-
     <TextView
         android:text="artsit"
         android:layout_width="match_parent"
@@ -146,4 +136,14 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="100dp"
         tools:layout_alignTop="@+id/repeatButton" />
+
+    <Button
+        android:text="play"
+        android:layout_height="80px"
+        android:id="@+id/playButton"
+        tools:background="@android:color/darker_gray"
+        android:textSize="10sp"
+        android:layout_width="110px"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

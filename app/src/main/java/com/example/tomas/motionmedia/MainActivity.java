@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private MainActivityFragment mainFragment = new MainActivityFragment();
     private SettingsFragment settingsFragment = new SettingsFragment();
     private HelpFragment helpFragment = new HelpFragment();
+    private Database db = new Database(this);
     private SongsManager songsManager = new SongsManager();
     private List<Song> actualPlaylist = new ArrayList<>();
     private List<Object> objectSongList = new ArrayList<>();
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         objectSongList = songsManager.getObjectSongList(getApplicationContext());
         artistList = songsManager.getArtistsList();
         allSongList = songsManager.getAllSongList();
+        db.saveSongs(allSongList);
     }
 
     /**
@@ -241,6 +243,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     public void setCurrentArtistIndex(int currentArtistIndex) {
         this.currentArtistIndex = currentArtistIndex;
+    }
+
+    public Database getDb() {
+        return db;
+    }
+
+    public void setDb(Database db) {
+        this.db = db;
     }
 
     public SongListFragment getSongListFragment() {
