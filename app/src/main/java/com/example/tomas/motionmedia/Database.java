@@ -3,6 +3,7 @@ package com.example.tomas.motionmedia;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -23,13 +24,13 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void saveSongs (List<Song> songList) {
-        //String name, String artist, String album, int length, String path, int skippedTotal, int skippedInWeek
         ContentValues contentValues = new ContentValues();
         for (int i = 0; i < songList.size() -1; i++){
             String name = songList.get(i).getSongName();
-            name = name.replaceAll("'","\'");
+            name = DatabaseUtils.sqlEscapeString(name);
             String path = songList.get(i).getSongPath();
-            path = path.replaceAll("'","\'");
+            path = DatabaseUtils.sqlEscapeString(path);
+            contentValues.put("SONG_ID", songList.get(i).getId());
             contentValues.put("NAME", name);
             contentValues.put("ARTIST", songList.get(i).getSongArtist());
             contentValues.put("ALBUM", songList.get(i).getSongAlbum());
@@ -39,49 +40,57 @@ public class Database extends SQLiteOpenHelper {
             contentValues.put("SKIPPED_IN_WEEK", 0);
             getWritableDatabase().insert("SONGS", null, contentValues);
         }
-
-
     }
 
-    public Song getSongs (){
+    public Song getSong (int id){
         Song song = new Song();
-        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS", null);
-        return song;
-    }
-
-    public Song getSong (String path){
-        Song song = new Song();
-        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE PATH LIKE?", new String[]{path});
-        return song;
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SONG_ID = " + id + ";", null);
+        if (cursor.moveToFirst()){
+            song.setId(cursor.getInt(1));
+            song.setSongName(cursor.getString(2));
+            song.setSongArtist(cursor.getString(3));
+            song.setSongLength(cursor.getInt(4));
+            song.setSongAlbum(cursor.getString(5));
+            song.setSongPath(cursor.getString(6));
+            song.setSkipped(cursor.getInt(7));
+            return song;
+        }
+        return null;
     }
 
     public List<Song> getSongsForDel (){
         List<Song> songList = new ArrayList<>();
-        Song song = new Song();
-        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SKIPPED_TOTAL > 5;", null);
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SKIPPED_TOTAL > 10 OR SKIPPED_IN_WEEK > 5;", null);
         if (cursor.moveToFirst()){
             do {
-                cursor.moveToFirst();
-                song.setSongName(cursor.getString(1));
-                song.setSongArtist(cursor.getString(2));
-                song.setSongLength(cursor.getInt(3));
-                song.setSongAlbum(cursor.getString(4));
-                song.setSongPath(cursor.getString(5));
+                Song song = new Song();
+                song.setId(cursor.getInt(1));
+                song.setSongName(cursor.getString(2));
+                song.setSongArtist(cursor.getString(3));
+                song.setSongLength(cursor.getInt(4));
+                song.setSongAlbum(cursor.getString(5));
+                song.setSongPath(cursor.getString(6));
+                song.setSkipped(cursor.getInt(7));
                 songList.add(song);
             } while (cursor.moveToNext());
         }
         return songList;
     }
 
-    public void markSkippedSong (String path) {
+    public void markSkippedSong (int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        //difficulty=difficulty.replaceAll("'","\'");
-        ///storage/sdcard1/Hudba/The Offspring/14.(Can't Get My) Head Around You.mp3
-        path = path.replaceAll("'","\'");
+        //path = DatabaseUtils.sqlEscapeString(path);
+        db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = SKIPPED_TOTAL + 1 WHERE SONG_ID =" + id + ";");
+    }
 
-        int i = 0;
-        path = path.replace("'","\'");
-        db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = SKIPPED_TOTAL + 1 WHERE PATH LIKE '"  + path + "'");
+    public void clearSkippedTotal (){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = 0;");
+    }
+
+    public void clearSkippedWeek () {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE SONGS SET SKIPPED_WEEK = 0;");
     }
 
     public void clearSongs () {
@@ -92,14 +101,14 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE SONGS (ID INTEGER PRIMARY KEY NOT NULL,NAME TEXT, ARTIST TEXT, LENGTH INTEGER,ALBUM TEXT, PATH TEXT, SKIPPED_TOTAL INTEGER, SKIPPED_IN_WEEK integer );");
-       // db.execSQL("CREATE TABLE SONGS_FOR_DEL (ID INTEGER PRIMARY KEY NOT NULL);");
+        db.execSQL("CREATE TABLE SONGS (ID INTEGER PRIMARY KEY NOT NULL, SONG_ID INTEGER,NAME TEXT, ARTIST TEXT, LENGTH INTEGER,ALBUM TEXT, PATH TEXT, SKIPPED_TOTAL INTEGER, SKIPPED_IN_WEEK INTEGER );");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE SONGS;");
-        db.execSQL("DROP TABLE SONGS_FOR_DEL;");
+        //db.execSQL("DROP TABLE SONGS_FOR_DEL;");
         onCreate(db);
     }
 }

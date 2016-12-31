@@ -19,6 +19,7 @@ public class SongsManager {
     private List<Song> allSongList = new ArrayList<Song>();
     private List<Object> objectSongList = new ArrayList<>();
     private List<String> artistList = new ArrayList<>();
+    private int idCounter = 0;
 
     /**
      *nonparametric constructor
@@ -54,7 +55,7 @@ public class SongsManager {
                     //Log.i(TAG, "Title column index: " + String.valueOf(titleColumn));
                     //Log.i(TAG, "ID column index: " + String.valueOf(titleColumn));
                    // Log.i("Final ", "ID: " + cur.getString(idColumn) + " Title: " + cur.getString(titleColumn) + "Path: " + cur.getString(filePathIndex));
-                    Song song = new Song(cur.getString(titleColumn),cur.getString(artistColumn), cur.getInt(durationColumn), cur.getString(filePathIndex), cur.getString(albumColumn));
+                    Song song = new Song(idCounter,cur.getString(titleColumn),cur.getString(artistColumn), cur.getInt(durationColumn), cur.getString(filePathIndex), cur.getString(albumColumn));
                     allSongList.add(song);
                     if (!artistList.contains(song.getSongArtist())){
                         artistList.add(song.getSongArtist());
@@ -68,6 +69,7 @@ public class SongsManager {
                         objectSongList.set(i,childList);
                         childList = new ArrayList<>();
                     }
+                    idCounter++;
                 } while (cur.moveToNext());
             }
 
@@ -107,5 +109,6 @@ public class SongsManager {
                 return o1.getSongName().compareToIgnoreCase(o2.getSongName());
             }
         });
+
         return allSongList; }
 }

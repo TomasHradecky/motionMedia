@@ -14,16 +14,20 @@ public class Song {
     private int songLength;
     private String songPath;
     private String songAlbum;
+    private int skipped;
+    private int id;
 
     /**
      * constructor
+     * @param id identification of song
      * @param songName name of song
      * @param songArtist artist of song
      * @param songLength length of song in milliseconds
      * @param songPath location of song in device
      * @param songAlbum album of song
      */
-    public Song (String songName,String songArtist,int songLength, String songPath, String songAlbum) {
+    public Song (int id, String songName,String songArtist,int songLength, String songPath, String songAlbum) {
+        this.id = id;
         this.songName = songName;
         this.songArtist = songArtist;
         this.songLength = songLength;
@@ -77,5 +81,21 @@ public class Song {
 
     public void setSongAlbum(String songAlbum) {
         this.songAlbum = songAlbum;
+    }
+
+    public int getSkipped() {
+        return skipped;
+    }
+
+    public void setSkipped(int skipped) {
+        this.skipped = skipped;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

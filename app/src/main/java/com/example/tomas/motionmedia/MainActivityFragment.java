@@ -41,7 +41,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     private GoOnHelpListener goOnHelpListener;
     private Song song;
     private MediaPlayer mediaPlayer = new MediaPlayer();
-    private Button playButton, randomButton, repeatButton, previousButton;
+    private Button playButton, randomButton, repeatButton, previousButton, nextButton, trackListButton;
     private TextView songTimeCurent, songName, songArtist, songAlbum, songTimeEnd;
     private Boolean isRandom = false;
     private Boolean isRepeat = false;
@@ -56,7 +56,6 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     private SensorManager sensorManager;
     private double ax, ay, az, gx, gy, gz, mx, my, mz, tmpAx, tmpAy, tmpAz, dAx, dAy, dAz, lAx, lAy, lAz;
     private boolean counter, isGravity = false, isMagnetic = false, isLinearAccell = false;
-    private int c;
     /**
      * nonparametric constructor
      */
@@ -92,9 +91,9 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         repeatButton = (Button) layout.findViewById(R.id.repeatButton);
         randomButton = (Button) layout.findViewById(R.id.randomButton);
         playButton = (Button) layout.findViewById(R.id.playButton);
-        Button nextButton = (Button) layout.findViewById(R.id.nextButton);
+        nextButton = (Button) layout.findViewById(R.id.nextButton);
         previousButton = (Button) layout.findViewById(R.id.prevButton);
-        Button trackListButton = (Button) layout.findViewById(R.id.trackListButton);
+        trackListButton = (Button) layout.findViewById(R.id.trackListButton);
         songName = (TextView) layout.findViewById(R.id.songNameText);
         songTimeCurent = (TextView) layout.findViewById(R.id.timeText1);
         songTimeEnd = (TextView) layout.findViewById(R.id.timeText2);
@@ -222,7 +221,30 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
             }
         });
         setSharedPreferences();
+        waitUntilSongsLoaded();
         return layout;
+
+    }
+
+    public void waitUntilSongsLoaded (){
+        if(((MainActivity)getActivity()).isSongsLoaded()){
+            trackListButton.setEnabled(true);
+            playButton.setEnabled(true);
+            previousButton.setEnabled(true);
+            nextButton.setEnabled(true);
+            Toast.makeText(getContext(), "Songs are loaded and ready for play", Toast.LENGTH_SHORT).show();
+        } else {
+            try {
+                trackListButton.setEnabled(false);
+                playButton.setEnabled(false);
+                previousButton.setEnabled(false);
+                nextButton.setEnabled(false);
+                Thread.sleep(500);
+                waitUntilSongsLoaded();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -393,7 +415,8 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
      */
     public void nextSongButtonAction() {
         Database db = ((MainActivity)getActivity()).getDb();
-        db.markSkippedSong(getSong().getSongPath());
+        db.markSkippedSong(getSong().getId());
+        Song bb = db.getSong(getSong().getId());
         if (isRandom && isRepeat) {
             int low = 0;
             int high = playList.size();
@@ -559,7 +582,6 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
 
         } else {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-                c++;
                 //System.out.println(c);
                 if (counter) {
                     tmpAx=event.values[0];

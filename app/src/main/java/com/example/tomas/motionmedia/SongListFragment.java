@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.example.tomas.motionmedia.R.id.all;
 import static com.example.tomas.motionmedia.R.id.songList;
 
 public class SongListFragment extends Fragment {
@@ -32,6 +34,7 @@ public class SongListFragment extends Fragment {
     private List<String> artistList;
     private List<Song> songForDelList = new ArrayList<>();
     private GoOnMainListener goOnMainListener;
+    private Database db;
     private View layout;
     private Button artistButton, allSongListButton, songsForDelButton, actualPlayListButton;
     private ListView list;
@@ -51,6 +54,7 @@ public class SongListFragment extends Fragment {
             artistList = ((MainActivity)getActivity()).getArtistList();
             actualPlayList = ((MainActivity)getActivity()).getActualPlaylist();
             allSongList =  ((MainActivity)getActivity()).getAllSongList();
+            //((MainActivity)getActivity()).getDb().saveSongs(allSongList);
         }
 
     }
@@ -195,7 +199,8 @@ public class SongListFragment extends Fragment {
                 artistButton.setEnabled(true);
                 expList.setVisibility(View.GONE);
                 list.setVisibility(View.VISIBLE);
-                songForDelList = ((MainActivity)getActivity()).getDb().getSongsForDel();
+                db = ((MainActivity)getActivity()).getDb();
+                songForDelList = db.getSongsForDel();
                 if (songForDelList.isEmpty()){
                     songForDelList = new ArrayList<Song>();
                     list.setAdapter(new SongListAdapter(getContext(), songForDelList));
