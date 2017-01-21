@@ -1,11 +1,16 @@
 package com.example.tomas.motionmedia;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -17,6 +22,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,6 +47,9 @@ public class SongListFragment extends Fragment {
     private Button artistButton, allSongListButton, songsForDelButton, actualPlayListButton;
     private ListView list;
     private ExpandableListView expList;
+    private boolean useExpList = false;
+    private static final int REQUEST_WRITE_STORAGE = 112;
+    private File file;
 
     /**
      * nonparametric constructor
@@ -200,7 +211,7 @@ public class SongListFragment extends Fragment {
                 expList.setVisibility(View.GONE);
                 list.setVisibility(View.VISIBLE);
                 db = ((MainActivity)getActivity()).getDb();
-                songForDelList = db.getSongsForDel();
+                songForDelList = db.getSongsForDel(((MainActivity) getActivity()).getCountForDelTotal(), ((MainActivity) getActivity()).getCountForDelWeek());
                 if (songForDelList.isEmpty()){
                     songForDelList = new ArrayList<Song>();
                     list.setAdapter(new SongListAdapter(getContext(), songForDelList));
@@ -227,8 +238,50 @@ public class SongListFragment extends Fragment {
      @Override
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(Menu.NONE, R.id.itemA, Menu.NONE, "Add to actual playlist");
-        menu.add(Menu.NONE, R.id.itemB, Menu.NONE, "Delete song");
+         AdapterView.AdapterContextMenuInfo mInfo = null;
+         ExpandableListView.ExpandableListContextMenuInfo expInfo= null;
+         useExpList = false;
+         int type = 0;
+         try {
+            mInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
+         } catch (Exception e) {
+             e.printStackTrace();
+             useExpList = true;
+             expInfo = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+             type = ExpandableListView.getPackedPositionType(expInfo.packedPosition);
+         }
+         if (!useExpList){
+             menu.setHeaderTitle(allSongList.get(mInfo.position).getSongName());
+             menu.add(Menu.NONE, R.id.itemA, Menu.NONE, "Add to actual playlist");
+             menu.add(Menu.NONE, R.id.itemB, Menu.NONE, "Delete song");
+         } else if (type == 1 & useExpList){
+             Song s;
+             int groupPos = ExpandableListView.getPackedPositionGroup(expInfo.packedPosition);
+             int childPos = ExpandableListView.getPackedPositionChild(expInfo.packedPosition);
+             s =(Song) (expList.getExpandableListAdapter().getChild(groupPos,childPos));
+             menu.setHeaderTitle(s.getSongName());
+             menu.add(Menu.NONE, R.id.itemA, Menu.NONE, "Add to actual playlist");
+             menu.add(Menu.NONE, R.id.itemB, Menu.NONE, "Delete song");
+         }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                    file.delete();
+                } else
+                {
+                    Toast.makeText(getActivity(), "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+
     }
 
     @Override
@@ -250,9 +303,21 @@ public class SongListFragment extends Fragment {
                     return true;
                 case R.id.itemB:
                     s =(Song) (list.getAdapter().getItem((int)info.id));
-                    File file = new File(s.getSongPath());
+                    file = new File(s.getSongPath());
                     file.delete();
-                    return true;
+                    ((MainActivity)getActivity()).refreshSongs();
+
+                    /*
+                    boolean hasPermission = (ContextCompat.checkSelfPermission(getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasPermission) {
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                REQUEST_WRITE_STORAGE);
+                    } else {
+                        file.delete();
+                    }
+                    return true;*/
             }
         } else {
             ExpandableListView.ExpandableListContextMenuInfo expInfo= (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
@@ -269,14 +334,24 @@ public class SongListFragment extends Fragment {
                     s =(Song) (expList.getExpandableListAdapter().getChild(groupPos,childPos));
                     File file = new File(s.getSongPath());
                     file.delete();
+                    ((MainActivity)getActivity()).refreshSongs();
+                    /*
+                    boolean hasPermission = (ContextCompat.checkSelfPermission(getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasPermission) {
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                REQUEST_WRITE_STORAGE);
+                    } else {
+                        file.delete();
+                    }
+
                     return true;
+                */
             }
         }
         return super.onContextItemSelected(item);
     }
-
-
-
 
     public interface GoOnMainListener {
         public void goOnMain(Song song, List<Song> songList);

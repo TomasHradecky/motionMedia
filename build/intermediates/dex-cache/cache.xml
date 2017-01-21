@@ -66,21 +66,21 @@
     </item>
     <item
         is-multidex="true"
-        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="50ba7aacc2666bbc0c93af8da9f742fe4b462f2a">
-        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_55e460fd762c8f86b7d72c3271f2de59fec708e6\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="33b53c678abe758aaab7e52fa0607dd95a6d83e0">
+        sha1="4243f850ce3966b47621b34979ba78c079ba7644">
         <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_661eb7ef580e88bd764c47a676aee56238ca3c37\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="675848ca62bc35942b7cfa3938384cc2a9a8126b">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_55e460fd762c8f86b7d72c3271f2de59fec708e6\classes.dex" />
     </item>
     <item
         is-multidex="true"

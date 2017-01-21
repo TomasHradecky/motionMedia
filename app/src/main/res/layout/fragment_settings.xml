@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragmentSettings"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="1280px">
 
     <Switch
         android:text="Use motion control"
@@ -166,5 +172,89 @@
         android:layout_alignStart="@+id/yValue"
         android:id="@+id/zValue" />
 
+    <Button
+        android:text="clear total skipped"
+        android:layout_height="wrap_content"
+        android:id="@+id/clearTotalSkippedButton"
+        android:layout_width="150dp"
+        android:layout_below="@+id/skippedSongSwitch"
+        android:layout_alignRight="@+id/skippedSongSwitch"
+        android:layout_alignEnd="@+id/skippedSongSwitch"
+        android:enabled="false"/>
 
+    <TextView
+        android:text="Count of total skips to suggest for del"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/weekSkipSeekBar"
+        android:layout_alignLeft="@+id/zAxisTextView"
+        android:layout_alignStart="@+id/zAxisTextView"
+        android:layout_marginTop="20dp"
+        android:id="@+id/totalSkipTextView" />
+
+    <TextView
+        android:text="Count of week skips to suggest for del"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:id="@+id/weekSkipTextView"
+        android:layout_below="@+id/clearWeekSkippedButton"
+        android:layout_alignLeft="@+id/totalSkipTextView"
+        android:layout_alignStart="@+id/totalSkipTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/zValue"
+        android:layout_alignStart="@+id/zValue"
+        android:id="@+id/weekSkipValuetextView"
+        android:layout_alignTop="@+id/weekSkipTextView" />
+
+    <Button
+        android:text="clear skipped for week"
+        android:layout_height="wrap_content"
+        android:id="@+id/clearWeekSkippedButton"
+        android:layout_width="150dp"
+        android:enabled="false"
+        android:layout_below="@+id/skippedSongSwitch"
+        android:layout_alignLeft="@+id/weekSkipTextView"
+        android:layout_alignStart="@+id/weekSkipTextView" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/totalSkipTextView"
+        android:layout_alignLeft="@+id/weekSkipSeekBar"
+        android:layout_alignStart="@+id/weekSkipSeekBar"
+        android:layout_marginTop="5dp"
+        android:id="@+id/totalSkipSeekBar"
+        android:layout_alignRight="@+id/totalSkipValueTextView"
+        android:layout_alignEnd="@+id/totalSkipValueTextView"
+        android:max="30"
+        android:progress="10" />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/weekSkipSeekBar"
+        android:layout_below="@+id/weekSkipTextView"
+        android:layout_alignLeft="@+id/weekSkipTextView"
+        android:layout_alignStart="@+id/weekSkipTextView"
+        android:layout_marginTop="5dp"
+        android:layout_alignRight="@+id/weekSkipValuetextView"
+        android:layout_alignEnd="@+id/weekSkipValuetextView"
+        android:max="20"
+        android:progress="5" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/totalSkipValueTextView"
+        android:layout_alignBaseline="@+id/totalSkipTextView"
+        android:layout_alignBottom="@+id/totalSkipTextView"
+        android:layout_alignLeft="@+id/weekSkipValuetextView"
+        android:layout_alignStart="@+id/weekSkipValuetextView" />
 </RelativeLayout>
+</ScrollView>

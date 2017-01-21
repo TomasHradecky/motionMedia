@@ -23,6 +23,10 @@ public class Database extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * save all songs to database
+     * @param songList
+     */
     public void saveSongs (List<Song> songList) {
         ContentValues contentValues = new ContentValues();
         for (int i = 0; i < songList.size() -1; i++){
@@ -42,6 +46,11 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * return song from database by id
+     * @param id od song
+     * @return
+     */
     public Song getSong (int id){
         Song song = new Song();
         Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SONG_ID = " + id + ";", null);
@@ -58,9 +67,13 @@ public class Database extends SQLiteOpenHelper {
         return null;
     }
 
-    public List<Song> getSongsForDel (){
+    /**
+     * return songs with enough skipped to delete them
+     * @return
+     */
+    public List<Song> getSongsForDel (int totalSkip, int weekSkip){
         List<Song> songList = new ArrayList<>();
-        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SKIPPED_TOTAL > 10 OR SKIPPED_IN_WEEK > 5;", null);
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SKIPPED_TOTAL > " + totalSkip + "  OR SKIPPED_IN_WEEK >" + weekSkip + " ;", null);
         if (cursor.moveToFirst()){
             do {
                 Song song = new Song();
@@ -77,28 +90,45 @@ public class Database extends SQLiteOpenHelper {
         return songList;
     }
 
+    /**
+     * add mark to skipped song
+     * @param id
+     */
     public void markSkippedSong (int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         //path = DatabaseUtils.sqlEscapeString(path);
         db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = SKIPPED_TOTAL + 1 WHERE SONG_ID =" + id + ";");
     }
 
+    /**
+     * clear marks about total count of skipping songs
+     */
     public void clearSkippedTotal (){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = 0;");
     }
 
+    /**
+     * clear marks about week count of skipping songs
+     */
     public void clearSkippedWeek () {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE SONGS SET SKIPPED_WEEK = 0;");
     }
 
+    /**
+     * clear whole SONGS table
+     */
     public void clearSongs () {
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM SONGS;");
 
     }
 
+    /**
+     * create table SONGS
+     * @param db
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE SONGS (ID INTEGER PRIMARY KEY NOT NULL, SONG_ID INTEGER,NAME TEXT, ARTIST TEXT, LENGTH INTEGER,ALBUM TEXT, PATH TEXT, SKIPPED_TOTAL INTEGER, SKIPPED_IN_WEEK INTEGER );");

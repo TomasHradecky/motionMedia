@@ -1,8 +1,11 @@
 package com.example.tomas.motionmedia;
 
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,12 +28,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private List<Song> allSongList = new ArrayList<>();
     private List<Song> songForDel = new ArrayList<>();
     private Song currentSong;
-    private int currentSongIndex;
+    private int currentSongIndex, currentArtistIndex;
     private int xCoordinationSensitivity = 18, yCoordinationSensitivity = 18, zCoordinationSensitivity = 18;
-    private int currentArtistIndex;
-    private boolean useMotionControl;
-    private boolean skippedSong;
-    private boolean songsLoaded = false;
+    private int countForDelTotal = 10, countForDelWeek = 5;
+    private boolean useMotionControl, skippedSong, songsLoaded = false;
+    private SharedPreferences.Editor editor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        new SongLoader().execute();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = preferences.edit();
+        songsLoaded = preferences.getBoolean("songsLoaded", false);
+
+        if (!songsLoaded) {
+            new SongLoader().execute();
+        }
 
         /**
          * Prepare container for fragments
@@ -53,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -90,20 +97,32 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         objectSongList = songsManager.getObjectSongList(getApplicationContext());
         artistList = songsManager.getArtistsList();
         allSongList = songsManager.getAllSongList();
-        songForDel = db.getSongsForDel();
+        songForDel = db.getSongsForDel(countForDelTotal, countForDelWeek);
+        db.clearSongs();
         db.saveSongs(allSongList);
+        Toast.makeText(this, "Song list refreshed", Toast.LENGTH_SHORT);
+    }
+
+    public void reloadFragment (Fragment frg) {
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.detach(frg);
+        ft.commit();
+        ft.attach(frg);
+        ft.commit();
     }
 
     private class SongLoader extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
+
             objectSongList = songsManager.getObjectSongList(getApplicationContext());
             artistList = songsManager.getArtistsList();
             allSongList = songsManager.getAllSongList();
             db.saveSongs(allSongList);
-            System.out.println("HOTOVO");
             songsLoaded = true;
+            editor.putBoolean("songsLoaded", songsLoaded);
+            editor.commit();
             return "Executed";
         }
     }
@@ -113,14 +132,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
      */
     public void goOnHelp ()  {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, helpFragment);
+        fragmentTransaction.replace(R.id.fragment_container, helpFragment, "help");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     public void goOnMain (Song song, List<Song> playList) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, mainFragment );
+        fragmentTransaction.replace(R.id.fragment_container, mainFragment, "main" );
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         mainFragment.setPlayList(playList);
@@ -129,14 +148,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     }
     public void goOnSettings () {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, settingsFragment );
+        fragmentTransaction.replace(R.id.fragment_container, settingsFragment, "settings" );
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     public void goOnSongList() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, songListFragment );
+        fragmentTransaction.replace(R.id.fragment_container, songListFragment, "list" );
         if (objectSongList.isEmpty() || artistList.isEmpty() || allSongList.isEmpty()){
             objectSongList = songsManager.getObjectSongList(getApplicationContext());
             artistList = songsManager.getArtistsList();
@@ -272,5 +291,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
     public void setSongsLoaded(boolean songsLoaded) {
         this.songsLoaded = songsLoaded;
+    }
+
+    public int getCountForDelWeek() {
+        return countForDelWeek;
+    }
+
+    public void setCountForDelWeek(int countForDelWeek) {
+        this.countForDelWeek = countForDelWeek;
+    }
+
+    public int getCountForDelTotal() {
+        return countForDelTotal;
+    }
+
+    public void setCountForDelTotal(int countForDelTotal) {
+        this.countForDelTotal = countForDelTotal;
     }
 }

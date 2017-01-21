@@ -226,6 +226,9 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
 
     }
 
+    /**
+    Ověřovat stav databáze aby se pokaždém spuštění všechno nepřepisovalo
+     */
     public void waitUntilSongsLoaded (){
         if(((MainActivity)getActivity()).isSongsLoaded()){
             trackListButton.setEnabled(true);
