@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
         android:textSize="16pt"
-        android:text="No song name"
+        android:text="No currentSong name"
         android:id="@+id/songNametextView"
         tools:lines="1"
         android:background="#DDDDDD"

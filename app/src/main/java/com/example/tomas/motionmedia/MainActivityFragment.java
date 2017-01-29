@@ -2,8 +2,6 @@ package com.example.tomas.motionmedia;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +13,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,9 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -33,15 +33,17 @@ import static android.content.Context.SENSOR_SERVICE;
 
 
 /**
+ * Created by Tomas Hradecky
  * Main fragment with music player features
  */
 public class MainActivityFragment extends Fragment implements SensorEventListener {
     private GoOnSongListListener goOnSongListListener;
     private GoOnSettingsListener goOnSettingsListener;
     private GoOnHelpListener goOnHelpListener;
-    private Song song;
+    private Song currentSong;
+    private int currentSongIndex;
     private MediaPlayer mediaPlayer = new MediaPlayer();
-    private Button playButton, randomButton, repeatButton, previousButton, nextButton, trackListButton;
+    private Button playButton, pauseButton, randomButton, repeatButton, previousButton, nextButton, trackListButton;
     private TextView songTimeCurent, songName, songArtist, songAlbum, songTimeEnd;
     private Boolean isRandom = false;
     private Boolean isRepeat = false;
@@ -52,33 +54,22 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     private List<Integer> playedSongIndexList = new ArrayList<>();
     private SeekBar songSeekBar;
     private ImageView songImageView;
-    private  final Handler handler=new Handler();
+    private Handler handler=new Handler();
     private SensorManager sensorManager;
-    private double ax, ay, az, gx, gy, gz, mx, my, mz, tmpAx, tmpAy, tmpAz, dAx, dAy, dAz, lAx, lAy, lAz;
-    private boolean counter, isGravity = false, isMagnetic = false, isLinearAccell = false;
+    private float ax, ay, dAx, dAy, lAx, lAy, absTmpAx, absAx, absAy, absTmpAy;
+    private float[] xDataList = new float[4];
+    private float[] yDataList = new float[4];
+    private float[] xDeltaList = new float[2];
+    private float[] yDeltaList = new float[2];
+    private boolean counter, isLinearAccell = false, isPaused = false, useMotion = false, newData = false, newDelta = false;
+    private int intCounter, intDeltaCounter;
+    private long timeNow;
+    private long lastUpdateTime;
+    private long lastActionTime;
     /**
      * nonparametric constructor
      */
     public MainActivityFragment() {
-    }
-
-    /**
-     * method for locate images in music path
-     * @param folder
-     */
-    public static void filelist(File folder)
-    {
-       // File folder = new File("C:/");
-        File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles)
-        {
-            if (file.isFile())
-            {
-                String[] filename = file.getName().split("\\.(?=[^\\.]+$)"); //split filename from it's extension
-                if(filename[1].endsWith(".jpg")) //matching defined filename
-                    System.out.println("File exist: "+filename[0]+"."+filename[1]); // match occures.Apply any condition what you need
-            }
-        }
     }
 
     @Override
@@ -86,11 +77,13 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                              Bundle savedInstanceState) {
         final View layout;
         layout =  inflater.inflate(R.layout.fragment_main, container, false);
+        lastUpdateTime = System.currentTimeMillis();
         prepareSensors();
 
         repeatButton = (Button) layout.findViewById(R.id.repeatButton);
         randomButton = (Button) layout.findViewById(R.id.randomButton);
         playButton = (Button) layout.findViewById(R.id.playButton);
+        pauseButton = (Button) layout.findViewById(R.id.pauseButton);
         nextButton = (Button) layout.findViewById(R.id.nextButton);
         previousButton = (Button) layout.findViewById(R.id.prevButton);
         trackListButton = (Button) layout.findViewById(R.id.trackListButton);
@@ -102,13 +95,21 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         songSeekBar = (SeekBar) layout.findViewById(R.id.songSeekBar);
         songImageView = (ImageView) layout.findViewById(R.id.imageView);
 
+        trackListButton.setEnabled(false);
+        playButton.setEnabled(false);
+        previousButton.setEnabled(false);
+        nextButton.setEnabled(false);
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = preferences.edit();
-
+        currentSongIndex = preferences.getInt("currentSongIndex", currentSongIndex);
+        setPlayList(((MainActivity)getActivity()).getDb().getPlaylistSongs());
         randomButton.setActivated(preferences.getBoolean("random", false));
         isRandom = preferences.getBoolean("random", false);
         repeatButton.setActivated(preferences.getBoolean("repeat", false));
         isRepeat = preferences.getBoolean("repeat", false);
+        isPaused = preferences.getBoolean("paused", false);
+        setPlayList(((MainActivity)getActivity()).getDb().getPlaylistSongs());
 
         if (isRandom){
             randomButton.setShadowLayer(8,-1,2,Color.BLUE);
@@ -121,26 +122,17 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
             repeatButton.setShadowLayer(8,-1,2,Color.WHITE);
         }
 
-        if (song != null){
-            setSongDescription(song);
-            setSongTime(song);
+        if (currentSong != null){
+            setSongDescription(currentSong);
+            setSongTime(currentSong);
             songSeekBar.setClickable(true);
-            String path = song.getSongPath();
-
-
-            File f = new File(path);
-            String parentPath= f.getParent();
-            filelist(new File(parentPath+"/"));
-            //parentPath = parentPath + "/*.mp3";
-
-            Bitmap bmp = BitmapFactory.decodeFile(parentPath);
-            int i = 0;
-            i++;
-            //songImageView.setImageBitmap();
-
-
-            //path.
+        } else if (!playList.isEmpty() & playList.size() >= currentSongIndex){
+            setCurrentSong(playList.get(currentSongIndex));
+            setSongDescription(currentSong);
+            setSongTime(currentSong);
+            songSeekBar.setClickable(true);
         }
+
         trackListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,10 +165,10 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                 setRepeat(!getRepeat());
                 if (isRepeat){
                     repeatButton.setShadowLayer(8,-1,2,Color.BLUE);
-                    Toast.makeText(getContext(), "Repeating was activated", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Repeating was activated", Toast.LENGTH_SHORT).show();
                 } else {
                     repeatButton.setShadowLayer(8,-1,2,Color.WHITE);
-                    Toast.makeText(getContext(), "Repeating was deactivated", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Repeating was deactivated", Toast.LENGTH_SHORT).show();
                 }
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = preferences.edit();
@@ -184,9 +176,6 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                 editor.commit();
             }
         });
-
-        setPlayButton();
-
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,27 +211,36 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         });
         setSharedPreferences();
         waitUntilSongsLoaded();
+        setPlayButton();
+        setPlayList(((MainActivity)getActivity()).getDb().getPlaylistSongs());
         return layout;
-
     }
 
-    /**
-    Ověřovat stav databáze aby se pokaždém spuštění všechno nepřepisovalo
-     */
     public void waitUntilSongsLoaded (){
+        int i = 0;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+        i = preferences.getInt("iterator", 0);
         if(((MainActivity)getActivity()).isSongsLoaded()){
             trackListButton.setEnabled(true);
             playButton.setEnabled(true);
             previousButton.setEnabled(true);
             nextButton.setEnabled(true);
-            Toast.makeText(getContext(), "Songs are loaded and ready for play", Toast.LENGTH_SHORT).show();
+            if (i == 0){
+                Toast.makeText(getContext(), "Songs are loaded and ready for play", Toast.LENGTH_SHORT).show();
+                i++;
+                editor.putInt("iterator", i);
+                editor.commit();
+            }
+
         } else {
             try {
                 trackListButton.setEnabled(false);
                 playButton.setEnabled(false);
                 previousButton.setEnabled(false);
                 nextButton.setEnabled(false);
-                Thread.sleep(500);
+                Toast.makeText(getContext(), "Wait until songs will be loaded and ready for play", Toast.LENGTH_LONG).show();
+                Thread.sleep(200);
                 waitUntilSongsLoaded();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -261,7 +259,6 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         editor.putString("album", songAlbum.getText().toString());
         editor.putBoolean("random", getRandom());
         editor.putBoolean("repeat", getRepeat());
-
         editor.commit();
     }
 
@@ -270,28 +267,36 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
      */
     public void setPlayButton () {
         if (mediaPlayer.isPlaying()){
-            playButton.setText("Pause");
-            playButton.setOnClickListener(new View.OnClickListener() {
+            playButton.setVisibility(View.GONE);
+            pauseButton.setVisibility(View.VISIBLE);
+            pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    playButton.setText("Play");
+                public void onClick(View view) {
                     mediaPlayer.pause();
                     setPlayButton();
                 }
             });
         } else {
-            playButton.setText("Play");
+            playButton.setVisibility(View.VISIBLE);
+            pauseButton.setVisibility(View.GONE);
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    playButton.setText("Pause");
+                public void onClick(View view) {
                     if (playList.isEmpty()){
                         ((MainActivity)getActivity()).refreshSongs();
-                        playList = ((MainActivity)getActivity()).getAllSongList();
+                        setPlayList(((MainActivity)getActivity()).getDb().getPlaylistSongs());
                         nextSongButtonAction();
-                        setSongTime(getSong());
+                        setSongTime(getCurrentSong());
+                    } else {
+                        if (isPaused & mediaPlayer.getCurrentPosition() != 1) {
+                            continuePlay();
+                        } else {
+                            setAnotherSong(playList.get(currentSongIndex));
+                            setCurrentSong(playList.get(currentSongIndex));
+                        }
                     }
-                    mediaPlayer.start();
+                    setSongDescription(getCurrentSong());
+                    songSeekBar.setClickable(true);
                     setPlayButton();
                 }
             });
@@ -319,10 +324,13 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
 
 
     /**
-     *Continuously setting song time in text views and progress in seek bar
-     * @param song currently playing song
+     *Continuously setting currentSong time in text views and progress in seek bar
+     * @param song currently playing currentSong
      */
     public void setSongTime (Song song){
+        if (handler == null){
+            handler = new Handler();
+        }
         handler.post(new Runnable(){
             @Override
             public void run() {
@@ -340,8 +348,8 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     }
 
     /**
-     *Set artist, ablum and name of currently playing song
-     * @param song currently playing song
+     *Set artist, ablum and name of currently playing currentSong
+     * @param song currently playing currentSong
      */
     public void setSongDescription (Song song){
         songName.setText("Song: " + song.getSongName());
@@ -356,24 +364,26 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     }
 
     /**
-     * Set next song for play
-     * @param i index of chosen song from playlist
+     * Set next currentSong for play
      */
-    public void setAnotherSong (int i) {
+    public void setAnotherSong (Song song) {
         if (mediaPlayer.isPlaying()){
             mediaPlayer.stop();
         }
         mediaPlayer.reset();
-        setSong(playList.get(i));
-        ((MainActivity)getActivity()).setCurrentSong(getSong());
-        ((MainActivity)getActivity()).setCurrentSongIndex(playList.indexOf(getSong()));
+        ((MainActivity)getActivity()).setCurrentSong(getCurrentSong());
+        ((MainActivity)getActivity()).setCurrentSongIndex(getCurrentSongIndex());
         setSharedPreferences();
-        play(playList.get(i).getSongPath());
+        play(song.getSongPath());
+    }
+
+    public void continuePlay () {
+            mediaPlayer.start();
     }
 
     /**
-     *Start play set song
-     * @param path path to song location
+     *Start play set currentSong
+     * @param path path to currentSong location
      */
     public void play (String path) {
         if (mediaPlayer.isPlaying()){
@@ -382,6 +392,9 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         }
         try{
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            if(path.startsWith("'")){
+                path = path.substring(1, path.length()-1);
+            }
             mediaPlayer.setDataSource(path);
             mediaPlayer.prepare();
             mediaPlayer.start();
@@ -397,7 +410,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
             e.printStackTrace();
         }
         if (!isRepeat){
-            playedSongIndexList.add(playList.indexOf(getSong()));
+            playedSongIndexList.add(getCurrentSongIndex());
         }
     }
 
@@ -414,40 +427,58 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     }
 
     /**
-     *Choose which next song is chosen (random and repeat or not)
+     *Choose which next currentSong is chosen (random and repeat or not)
      */
     public void nextSongButtonAction() {
-        Database db = ((MainActivity)getActivity()).getDb();
-        db.markSkippedSong(getSong().getId());
-        Song bb = db.getSong(getSong().getId());
+        if (currentSong != null) {
+            Database db = ((MainActivity)getActivity()).getDb();
+            db.markSkippedSong(getCurrentSong().getId());
+        }
         if (isRandom && isRepeat) {
             int low = 0;
             int high = playList.size();
             int result = random.nextInt(high - low) + low;
-            setAnotherSong(result);
-            setSongDescription(getSong());
+            Song nextSong = playList.get(result);
+            setAnotherSong(nextSong);
+            setCurrentSong(nextSong);
+            setSongDescription(getCurrentSong());
             refreshPreviousRandomValuesList(result);
         } else if (!isRandom && isRepeat) {
-            int i = playList.indexOf(song);
+            int i = getCurrentSongIndex();
             i++;
             if (i < playList.size() ){
-                setAnotherSong(i);
-                setSongDescription(getSong());
+                prepareNextSong(i);
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
             } else {
                 i = 0;
-                setAnotherSong(i);
-                setSongDescription(getSong());
+                prepareNextSong(i);
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
             }
         } else if (!isRandom && !isRepeat) {
-            int i = playList.indexOf(getSong());
+            int i = getCurrentSongIndex();
             i ++;
             if (i < playList.size() && !playedSongIndexList.contains(i) ){
-                setAnotherSong(i);
-                setSongDescription(getSong());}
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
+            }
             else if (i == playList.size() && !playedSongIndexList.contains(i)) {
                 i=0;
-                setAnotherSong(i);
-                setSongDescription(getSong());
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
             } else {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
@@ -463,8 +494,10 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                 result = random.nextInt(high - low) + low;
             }
             if (!previousRandomValues.contains(result)){
-                setAnotherSong(result);
-                setSongDescription(getSong());
+                Song nextSong = playList.get(result);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
                 refreshPreviousRandomValuesList(result);
             } else {
                 mediaPlayer.stop();
@@ -473,67 +506,85 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                 songTimeCurent.setText("0:00");
                 setPlayButton();
             }
+        }
+        setPlayButton();
+    }
+
+    public void prepareNextSong (int i) {
+        if (playList.isEmpty()){
+            setPlayList(((MainActivity)getActivity()).getDb().getPlaylistSongs());
+        }
+        Song s = playList.get(i);
+        if(s.getSongPath().startsWith("'")){
+            String path = s.getSongPath();
+            path = path.substring(1, path.length()-1);
+            s.setSongPath(path);
 
         }
+        if(s.getSongName().startsWith("'")){
+            String name = s.getSongName();
+            name = name.substring(1, name.length()-1);
+            s.setSongName(name);
+        }
+        playList.set(i,s);
     }
 
     public void nextRandomSong () {
         int low = 0;
         int high = playList.size();
         int result = random.nextInt(high - low) + low;
-        setAnotherSong(result);
-        setSongDescription(getSong());
+        Song nextSong = playList.get(result);
+        setAnotherSong(nextSong);
+        setCurrentSong(nextSong);
+        setSongDescription(getCurrentSong());
     }
 
     public void previousSongButtonAction () {
         if (isRandom && previousRandomValues.size() != 0) {
             if (previousRandomValuesListCounter - 1 > (- 1)){
-                setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter-1));
-                setSongDescription(getSong());
+                Song nextSong = playList.get(previousRandomValues.get(previousRandomValuesListCounter-1));
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
                 previousRandomValuesListCounter--;
             } else {
                 previousRandomValuesListCounter = previousRandomValues.size() - 1;
-                setAnotherSong(previousRandomValues.get(previousRandomValuesListCounter));
-                setSongDescription(getSong());
+                Song nextSong = playList.get(previousRandomValues.get(previousRandomValuesListCounter));
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
                 previousRandomValuesListCounter--;
             }
         } else if (isRandom && previousRandomValues.size() == 0) {
             previousButton.setEnabled(false);
         }
         else if (!isRandom) {
-            int i = playList.indexOf(song);
+            int i = getCurrentSongIndex();
             i--;
             if (-1 < i){
-                setAnotherSong(i);
-                setSongDescription(getSong());
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
             } else {
                 i = playList.size() - 1;
-                setAnotherSong(i);
-                setSongDescription(getSong());
+                Song nextSong = playList.get(i);
+                setAnotherSong(nextSong);
+                setCurrentSong(nextSong);
+                setSongDescription(getCurrentSong());
+                setCurrentSongIndex(i);
             }
         }
     }
 
     public void prepareSensors () {
         sensorManager=(SensorManager)getActivity().getSystemService(SENSOR_SERVICE);
-
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
-            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_NORMAL);
-            isGravity = true;
-
-        }
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
-            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
-            isMagnetic = true;
-
-        }
         if (sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null){
-            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
             isLinearAccell = true;
-
         } else {
-            //sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 20000000);
+            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -546,110 +597,194 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     //motion control code block
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (isGravity){
-            //get data from gravity
-            if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
-                gx = event.values[0];
-                gy = event.values[1];
-                gz = event.values[2];
-                System.out.println("gravity" + gx + " " + gy  + " " + gz);
-            }
-        }
-        if (isMagnetic){
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                mx = event.values[0];
-                my = event.values[1];
-                mz = event.values[2];
-                //System.out.println("magnetic" + mx + " " + my  + " " + mz);
-            }
-        }
-        if (isLinearAccell) {
-            if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
-                lAx=event.values[0];
-                lAy=event.values[1];
-                lAz=event.values[2];
-                if (lAx > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
-                    nextSongButtonAction();
-                }
-                if (lAx < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    previousSongButtonAction();
-                }
+        if (((MainActivity)getActivity()).isUseMotionControl()){
+            if (isLinearAccell) {
+                if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
+                    timeNow = System.currentTimeMillis();
+                    lAx=event.values[0];
+                    lAy=event.values[1];
+                    if (lastActionTime + 1000 < System.currentTimeMillis()) {
+                        if (lAx > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextSongButtonAction();
+                        }
+                        if (lAx < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            previousSongButtonAction();
+                        }
 
-                if (lAy > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    nextRandomSong();
+                        if (lAy > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextRandomSong();
+                        }
+                        if (lAy < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextRandomArtist();
+                        }
+                    }
                 }
-                if (lAy < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    nextRandomArtist();
-                }
-            }
+            } else {
+                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+                    float avgX = 0;
+                    float avgDeltaX = 0;
+                    float avgY = 0;
+                    float avgDeltaY = 0;
 
-        } else {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-                //System.out.println(c);
-                if (counter) {
-                    tmpAx=event.values[0];
-                    tmpAy=event.values[1];
-                    tmpAz=event.values[2];
-                } else {
-                    ax=event.values[0];
-                    ay=event.values[1];
-                    az=event.values[2];
-                }
-                counter=!counter;
-                dAx = tmpAx - ax;
-                dAy = tmpAy - ay;
-                dAz = tmpAz - az;
-                if (dAx < -((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()){
-                    //clearSensorData();
-                    nextSongButtonAction();
-                    delay();
-                    System.out.println("NEXT " + dAx);
-                }
-                if (dAx > ((MainActivity)getActivity()).getxCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    //clearSensorData();
-                    previousSongButtonAction();
-                    delay();
-                    System.out.println("PREV " + dAx);
-                }
+                    timeNow = System.currentTimeMillis();
+                    newDelta = false;
+                    newData = false;
+                    //get data minimally after 25 ms
+                    if (counter & timeNow > lastUpdateTime + 25) {
+                        ax=event.values[0];
+                        ay=event.values[1];
+                        lastUpdateTime = System.currentTimeMillis();
+                        newData = true;
+                        counter = !counter;
+                    } else if (!counter & timeNow > lastUpdateTime + 25){
+                        ax=event.values[0];
+                        ay=event.values[1];
+                        lastUpdateTime = System.currentTimeMillis();
+                        counter = !counter;
+                        newData = true;
+                        newDelta = true;
+                    }
+                    //new sensor data are ready
+                    if (newData) {
+                        xDataList[intCounter] = ax;
+                        yDataList[intCounter] = ay;
+                        intCounter++;
+                    }
+                    //delta values are calculated in absolute value;
+                    if (newDelta) {
+                        absAx = Math.abs(xDataList[intCounter]);
+                        absTmpAx = Math.abs(xDataList[intCounter - 1]);
+                        if (absTmpAx > absAx){
+                            dAx = absTmpAx - absAx;
+                            xDeltaList[intDeltaCounter] = dAx;
+                        } else {
+                            dAx = absAx - absTmpAx;
+                            xDeltaList[intDeltaCounter] = dAx;
+                        }
 
-                if (dAy < -((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    //clearSensorData();
-                    //nextRandomSong();
-                    //delay();
-                    //System.out.println("RANDOM");
+                        absAy = Math.abs(yDataList[intCounter]);
+                        absTmpAy = Math.abs(yDataList[intCounter - 1]);
+                        if (absTmpAy > absAy){
+                            dAy = absTmpAy - absAy;
+                            yDeltaList[intDeltaCounter] = dAy;
+                        } else {
+                            dAy = absAy - absTmpAy;
+                            yDeltaList[intDeltaCounter] = dAy;
+                        }
+                        intDeltaCounter++;
+                    }
+                    //set counter for fill fields with data
+                    if (intCounter == xDataList.length){
+                        intCounter = 0;
+                        intDeltaCounter = 0;
+                    }
+
+                    /**
+                     * if average is positive then all values in field are declared as positive and average is recalculate, similarly for negative average
+                     */
+                    //calculate average value of x speed
+                    for (int i = 0; i < xDataList.length - 1; i++){
+                        avgX = avgX + xDataList[i];
+                    }
+                    avgX = avgX / xDataList.length;
+                    if (avgX > 0){
+                        avgX = 0;
+                        for (int i = 0; i < xDataList.length - 1; i++){
+                            float tmp = Math.abs(xDataList[i]);
+                            avgX = avgX + tmp;
+                        }
+                        avgX = avgX / 4;
+                    } else {
+                        avgX = 0;
+                        for (int i = 0; i < xDataList.length - 1; i++){
+                            float tmp = Math.abs(xDataList[i]);
+                            avgX = avgX - tmp;
+                        }
+                        avgX = avgX / 4;
+                    }
+                    //calculate average value of y speed
+                    for (int i = 0; i < yDataList.length - 1; i++){
+                        avgY = avgY + yDataList[i];
+                    }
+                    avgY = avgY / yDataList.length;
+                    if (avgY > 0){
+                        avgY = 0;
+                        for (int i = 0; i < yDataList.length - 1; i++){
+                            float tmp = Math.abs(yDataList[i]);
+                            avgY = avgY + tmp;
+                        }
+                        avgY = avgY / 4;
+                    } else {
+                        avgY = 0;
+                        for (int i = 0; i < yDataList.length - 1; i++){
+                            float tmp = Math.abs(yDataList[i]);
+                            avgY = avgY - tmp;
+                        }
+                        avgY = avgY / 4;
+                    }
+                    //calculate average value of x delta speed
+                    for (int i = 0; i < xDeltaList.length -1; i++){
+                        avgDeltaX = avgDeltaX + xDeltaList[i];
+                    }
+                    avgDeltaX = avgDeltaX / 2;
+                    //calculate average value of y delta speed
+                    for (int i = 0; i < yDeltaList.length -1; i++){
+                        avgDeltaY = avgDeltaY + yDeltaList[i];
+                    }
+                    avgDeltaY = avgDeltaY / 2;
+
+                    /**
+                     *react on actions after 2 sec if average delta speed is bigger than 4 and average speed is bigger than value set by user
+                     */
+                    //Log.d("CURR", "      "+avgX + "       |||  " + avgY);
+                    //Log.d("DELTA", "     "+avgDeltaX + "   |||  " +avgDeltaY);
+                    if (lastActionTime + 2000 < System.currentTimeMillis()) {
+                        if (avgDeltaX > 4 & avgX >((MainActivity)getActivity()).getxCoordinationSensitivity() & mediaPlayer.isPlaying()){
+                            //Log.d("TAG", "NEXT " + avgX + "   ---   "  + ((MainActivity)getActivity()).getxCoordinationSensitivity() );
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextSongButtonAction();
+                        }
+                        if (avgDeltaX > 4 & avgX < - ((MainActivity)getActivity()).getxCoordinationSensitivity() & mediaPlayer.isPlaying()) {
+                            //Log.d("TAG", "PREV " + avgX + "   ---   "  + ((MainActivity)getActivity()).getxCoordinationSensitivity() );
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            previousSongButtonAction();
+                        }
+
+                        if (avgDeltaY > 4 & avgY > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                            //Log.d("TAG", "SONG " + avgY + "   ---   "  + ((MainActivity)getActivity()).getyCoordinationSensitivity() );
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextRandomSong();
+                        }
+                        if (avgDeltaY > 4 & avgY < - ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
+                            //Log.d("TAG", "ARTIST " + avgY + "   ---   "  + ((MainActivity)getActivity()).getyCoordinationSensitivity() );
+                            lastActionTime = System.currentTimeMillis();
+                            clearSensorData();
+                            nextRandomArtist();
+                        }
+                    } else {
+                        clearSensorData();
+                    }
                 }
-                if (dAy > ((MainActivity)getActivity()).getyCoordinationSensitivity() && mediaPlayer.isPlaying()) {
-                    //clearSensorData();
-                    //nextRandomArtist();
-                    //delay();
-                    //System.out.println("ARTIST");
-                }
-                //System.out.println("accel" + dAx + " " + dAy + " " + dAz);
-                if (dAy > 3 || dAy < -3)
-                System.out.println(dAy);
             }
         }
     }
 
     public  void clearSensorData () {
-        tmpAx = 0;
         ax = 0;
         dAx = 0;
-        tmpAy = 0;
         ay = 0;
         dAy = 0;
-        tmpAz = 0;
-        az = 0;
-        dAz = 0;
-    }
-
-    public void delay () {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
@@ -673,12 +808,22 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
         goOnHelpListener = null;
     }
 
-    public Song getSong() {
-        return song;
+    public Song getCurrentSong() {
+        return currentSong;
     }
 
-    public void setSong(Song song) {
-        this.song = song;
+    public void setCurrentSong(Song currentSong) {
+        this.currentSong = currentSong;
+        if(currentSong.getSongPath().startsWith("'")){
+            String path = currentSong.getSongPath();
+            path = path.substring(1, path.length()-1);
+            this.currentSong.setSongPath(path);
+        }
+        if(currentSong.getSongName().startsWith("'")){
+            String name = currentSong.getSongName();
+            name = name.substring(1, name.length()-1);
+            this.currentSong.setSongName(name);
+        }
     }
 
     public Boolean getRepeat() {
@@ -688,8 +833,8 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     public void setRepeat(Boolean repeat) {
         isRepeat = repeat;
         if (isRepeat){
-            playedSongIndexList = new ArrayList<>();
-            playedSongIndexList.add(playList.indexOf(getSong()));
+            playedSongIndexList.clear();
+            playedSongIndexList.add(getCurrentSongIndex());
         }
     }
 
@@ -700,7 +845,7 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
     public void setRandom(Boolean random) {
         isRandom = random;
         if (isRandom) {
-            previousRandomValues = new ArrayList<>();
+            previousRandomValues.clear();
         }
     }
 
@@ -710,5 +855,28 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
 
     public void setPlayList(List<Song> playList) {
         this.playList = playList;
+        playedSongIndexList.clear();
+        Collections.sort(this.playList, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongName().compareToIgnoreCase(o2.getSongName());
+            }
+        });
+    }
+
+    public int getCurrentSongIndex() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+        currentSongIndex = preferences.getInt("currentSongIndex", currentSongIndex);
+        return currentSongIndex;
+    }
+
+    public void setCurrentSongIndex(int currentSongIndex) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("currentSongIndex", currentSongIndex);
+        editor.commit();
+        this.currentSongIndex = currentSongIndex;
     }
 }
+

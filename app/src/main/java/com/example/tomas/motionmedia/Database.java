@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +41,89 @@ public class Database extends SQLiteOpenHelper {
             contentValues.put("PATH", path);
             contentValues.put("SKIPPED_TOTAL", 0);
             contentValues.put("SKIPPED_IN_WEEK", 0);
+            contentValues.put("IN_PLAYLIST", 0);
             getWritableDatabase().insert("SONGS", null, contentValues);
         }
+    }
+
+    /**
+     * mark all songs in playlist
+     * @param songList
+     */
+    public void markPlaylistSongs (List<Song> songList) {
+        for (int i = 0; i < songList.size(); i++){
+            int songId = songList.get(i).getId();
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.execSQL("UPDATE SONGS SET IN_PLAYLIST = 1 WHERE SONG_ID =" + songId + ";");
+
+        }
+    }
+
+    /**
+     * mark individual song added to playlist
+     * @param song
+     */
+    public void markPlaylistSong (Song song) {
+        int songId = song.getId();
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE SONGS SET IN_PLAYLIST = 1 WHERE SONG_ID =" + songId + ";");
+    }
+
+    /**
+     * clear songs marked for playlist
+     */
+    public void clearPlaylistSongs () {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE SONGS SET IN_PLAYLIST = 0;");
+    }
+
+    public void delSong (int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM SONGS WHERE SONG_ID = " + id +";");
+    }
+
+    public List<Song> getAllSongs () {
+        List<Song> songList = new ArrayList<>();
+        Song song;
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS;", null);
+        if (cursor.moveToFirst()) {
+            do {
+                song = new Song();
+                song.setId(cursor.getInt(0));
+                song.setSongName(cursor.getString(1));
+                song.setSongArtist(cursor.getString(2));
+                song.setSongLength(cursor.getInt(3));
+                song.setSongAlbum(cursor.getString(4));
+                song.setSongPath(cursor.getString(5));
+                song.setSkipped(cursor.getInt(6));
+                songList.add(song);
+            } while (cursor.moveToNext());
+        }
+        return songList;
+    }
+
+    /**
+     * get songs marked for playlist
+     * @return list of songs in playlist
+     */
+    public List<Song> getPlaylistSongs () {
+        List<Song> songList = new ArrayList<>();
+        Song song;
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE IN_PLAYLIST = 1;", null);
+        if (cursor.moveToFirst()) {
+            do {
+                song = new Song();
+                song.setId(cursor.getInt(0));
+                song.setSongName(cursor.getString(1));
+                song.setSongArtist(cursor.getString(2));
+                song.setSongLength(cursor.getInt(3));
+                song.setSongAlbum(cursor.getString(4));
+                song.setSongPath(cursor.getString(5));
+                song.setSkipped(cursor.getInt(6));
+                songList.add(song);
+            } while (cursor.moveToNext());
+        }
+        return songList;
     }
 
     /**
@@ -55,13 +135,13 @@ public class Database extends SQLiteOpenHelper {
         Song song = new Song();
         Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM SONGS WHERE SONG_ID = " + id + ";", null);
         if (cursor.moveToFirst()){
-            song.setId(cursor.getInt(1));
-            song.setSongName(cursor.getString(2));
-            song.setSongArtist(cursor.getString(3));
-            song.setSongLength(cursor.getInt(4));
-            song.setSongAlbum(cursor.getString(5));
-            song.setSongPath(cursor.getString(6));
-            song.setSkipped(cursor.getInt(7));
+            song.setId(cursor.getInt(0));
+            song.setSongName(cursor.getString(1));
+            song.setSongArtist(cursor.getString(2));
+            song.setSongLength(cursor.getInt(3));
+            song.setSongAlbum(cursor.getString(4));
+            song.setSongPath(cursor.getString(5));
+            song.setSkipped(cursor.getInt(6));
             return song;
         }
         return null;
@@ -77,13 +157,13 @@ public class Database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()){
             do {
                 Song song = new Song();
-                song.setId(cursor.getInt(1));
-                song.setSongName(cursor.getString(2));
-                song.setSongArtist(cursor.getString(3));
-                song.setSongLength(cursor.getInt(4));
-                song.setSongAlbum(cursor.getString(5));
-                song.setSongPath(cursor.getString(6));
-                song.setSkipped(cursor.getInt(7));
+                song.setId(cursor.getInt(0));
+                song.setSongName(cursor.getString(1));
+                song.setSongArtist(cursor.getString(2));
+                song.setSongLength(cursor.getInt(3));
+                song.setSongAlbum(cursor.getString(4));
+                song.setSongPath(cursor.getString(5));
+                song.setSkipped(cursor.getInt(6));
                 songList.add(song);
             } while (cursor.moveToNext());
         }
@@ -96,7 +176,6 @@ public class Database extends SQLiteOpenHelper {
      */
     public void markSkippedSong (int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        //path = DatabaseUtils.sqlEscapeString(path);
         db.execSQL("UPDATE SONGS SET SKIPPED_TOTAL = SKIPPED_TOTAL + 1 WHERE SONG_ID =" + id + ";");
     }
 
@@ -122,7 +201,6 @@ public class Database extends SQLiteOpenHelper {
     public void clearSongs () {
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("DELETE FROM SONGS;");
-
     }
 
     /**
@@ -131,14 +209,12 @@ public class Database extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE SONGS (ID INTEGER PRIMARY KEY NOT NULL, SONG_ID INTEGER,NAME TEXT, ARTIST TEXT, LENGTH INTEGER,ALBUM TEXT, PATH TEXT, SKIPPED_TOTAL INTEGER, SKIPPED_IN_WEEK INTEGER );");
-
+        db.execSQL("CREATE TABLE SONGS (SONG_ID INTEGER PRIMARY KEY NOT NULL,NAME TEXT, ARTIST TEXT, LENGTH INTEGER,ALBUM TEXT, PATH TEXT, SKIPPED_TOTAL INTEGER, SKIPPED_IN_WEEK INTEGER, IN_PLAYLIST INTEGER);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE SONGS;");
-        //db.execSQL("DROP TABLE SONGS_FOR_DEL;");
         onCreate(db);
     }
 }

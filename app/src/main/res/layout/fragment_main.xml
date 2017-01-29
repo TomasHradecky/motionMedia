@@ -56,14 +56,15 @@
         android:layout_marginBottom="29dp" />
 
     <TextView
-        android:text="song name"
+        android:text="currentSong name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/timeText2"
         android:id="@+id/songNameText"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        tools:lines="1" />
+        tools:lines="1"
+        android:textSize="18sp" />
 
     <TextView
         android:text="artsit"
@@ -72,7 +73,8 @@
         android:layout_above="@+id/songNameText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/artistTextView" />
+        android:id="@+id/artistTextView"
+        android:textSize="18sp" />
 
     <TextView
         android:text="album"
@@ -81,12 +83,13 @@
         android:layout_above="@+id/artistTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/albumTextView" />
+        android:id="@+id/albumTextView"
+        android:textSize="18sp" />
 
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/playButton"
+        android:layout_above="@+id/nextButton"
         android:layout_centerHorizontal="true"
         android:id="@+id/songSeekBar"
         android:clickable="false" />
@@ -124,19 +127,6 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="37dp" />
 
-    <ImageView
-        app:srcCompat="@android:drawable/ic_btn_speak_now"
-        android:id="@+id/imageView"
-        android:layout_width="300px"
-        android:layout_height="300px"
-        android:layout_marginTop="15dp"
-        android:layout_alignTop="@+id/repeatButton"
-        android:layout_toLeftOf="@+id/playButton"
-        android:layout_toStartOf="@+id/playButton"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="100dp"
-        tools:layout_alignTop="@+id/repeatButton" />
-
     <Button
         android:text="play"
         android:layout_height="80px"
@@ -146,4 +136,28 @@
         android:layout_width="110px"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="pause"
+        android:layout_width="110px"
+        android:layout_height="80px"
+        tools:background="@android:color/darker_gray"
+        android:id="@+id/pauseButton"
+        android:textSize="10sp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        />
+
+    <ImageView
+        app:srcCompat="@android:drawable/ic_btn_speak_now"
+        android:id="@+id/imageView"
+        android:layout_width="300px"
+        android:layout_height="300px"
+        tools:layout_alignTop="@+id/repeatButton"
+        android:layout_marginTop="17dp"
+        android:layout_alignTop="@+id/repeatButton"
+        android:layout_toRightOf="@+id/timeText1"
+        android:layout_toEndOf="@+id/timeText1"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp" />
 </RelativeLayout>

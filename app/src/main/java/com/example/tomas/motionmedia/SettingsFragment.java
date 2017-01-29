@@ -1,12 +1,14 @@
 package com.example.tomas.motionmedia;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import java.util.Calendar;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +19,21 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 /**
+ * Created by Tomas Hradecky
  * fragment with settings of motion control sensitivity and skipped song detection
  */
 public class SettingsFragment extends Fragment {
     private View layout;
-    private SeekBar xSensitivitySeekBar, ySensitivitySeekBar, zSensitivitySeekBar, weekSkipSeekBar, totalSkipSeekBar;
-    private Button xDefaultButton, yDefaultButton, zDefaultButton, clearWeekSkipButton, clearTotalSkipButton;
-    private TextView xValue, yValue, zValue, weekSkipTextView, totalSkipTextView, weekSkipValueTextView, totalSkipValueTextView;
+    private SeekBar xSensitivitySeekBar, ySensitivitySeekBar, weekSkipSeekBar, totalSkipSeekBar;
+    private Button xDefaultButton, yDefaultButton, clearWeekSkipButton, clearTotalSkipButton;
+    private TextView xValue, yValue, weekSkipTextView, totalSkipTextView, weekSkipValueTextView, totalSkipValueTextView;
+    private int xCoordinationSensitivity, yCoordinationSensitivity;
+    private int defaultSensitivity = 5, defaultSkipWeek = 5, defaultSkipTotal = 10;
+    private int countForDelTotal, countForDelWeek;
+    private boolean useMotionControl, skippedSong;
+    private Bundle bundle;
+    private AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
 
 
     public SettingsFragment() {
@@ -32,6 +42,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bundle = new Bundle();
     }
 
     @Override
@@ -39,11 +50,11 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.fragment_settings, container, false);
         final Switch motionControlSwitch = (Switch) layout.findViewById(R.id.motionControlSwitch);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final SharedPreferences.Editor editor = preferences.edit();
 
         //prepare components
-        TextView xAxisDescription = (TextView) layout.findViewById(R.id.xAxisTextView);
+        final TextView xAxisDescription = (TextView) layout.findViewById(R.id.xAxisTextView);
         xSensitivitySeekBar = (SeekBar) layout.findViewById(R.id.xAxisSeekBar);
         xDefaultButton = (Button) layout.findViewById(R.id.defaultXButton);
         xValue = (TextView) layout.findViewById(R.id.xValue);
@@ -53,11 +64,6 @@ public class SettingsFragment extends Fragment {
         yDefaultButton = (Button) layout.findViewById(R.id.defaultYButton);
         yValue = (TextView) layout.findViewById(R.id.yValue);
 
-        TextView zAxisDescription = (TextView) layout.findViewById(R.id.zAxisTextView);
-        zSensitivitySeekBar = (SeekBar) layout.findViewById(R.id.zAxisSeekBar);
-        zDefaultButton = (Button) layout.findViewById(R.id.defaultZButton);
-        zValue = (TextView) layout.findViewById(R.id.zValue);
-
         clearWeekSkipButton = (Button) layout.findViewById(R.id.clearWeekSkippedButton);
         clearTotalSkipButton = (Button) layout.findViewById(R.id.clearTotalSkippedButton);
 
@@ -65,10 +71,8 @@ public class SettingsFragment extends Fragment {
         totalSkipTextView = (TextView) layout.findViewById(R.id.totalSkipTextView);
         weekSkipSeekBar = (SeekBar) layout.findViewById(R.id.weekSkipSeekBar);
         weekSkipSeekBar.setMax(20);
-        weekSkipSeekBar.setProgress(((MainActivity)getActivity()).getCountForDelWeek());
         totalSkipSeekBar = (SeekBar) layout.findViewById(R.id.totalSkipSeekBar);
         totalSkipSeekBar.setMax(30);
-        totalSkipSeekBar.setProgress(((MainActivity)getActivity()).getCountForDelTotal());
         weekSkipValueTextView = (TextView) layout.findViewById(R.id.weekSkipValuetextView);
         totalSkipValueTextView = (TextView) layout.findViewById(R.id.totalSkipValueTextView);
 
@@ -77,64 +81,59 @@ public class SettingsFragment extends Fragment {
         //set prepared components
         motionControlSwitch.setChecked(preferences.getBoolean("motionControl", false));
         xSensitivitySeekBar.setEnabled(preferences.getBoolean("xSeekBar", false));
-        xSensitivitySeekBar.setProgress(preferences.getInt("xProgress", ((MainActivity)getActivity()).getxCoordinationSensitivity()));
-        xValue.setText(String.valueOf(preferences.getInt("xProgress", ((MainActivity)getActivity()).getxCoordinationSensitivity())));
+        xSensitivitySeekBar.setProgress(preferences.getInt("xProgress", defaultSensitivity) - 3);
+        xValue.setText(String.valueOf(preferences.getInt("xProgress", defaultSensitivity)));
         xDefaultButton.setEnabled(preferences.getBoolean("xDefButton", false));
 
         ySensitivitySeekBar.setEnabled(preferences.getBoolean("ySeekBar", false));
-        ySensitivitySeekBar.setProgress(preferences.getInt("yProgress", ((MainActivity)getActivity()).getyCoordinationSensitivity()));
-        yValue.setText(String.valueOf(preferences.getInt("yProgress", ((MainActivity)getActivity()).getyCoordinationSensitivity())));
+        ySensitivitySeekBar.setProgress(preferences.getInt("yProgress", defaultSensitivity) - 3);
+        yValue.setText(String.valueOf(preferences.getInt("yProgress", defaultSensitivity)));
         yDefaultButton.setEnabled(preferences.getBoolean("yDefButton", false));
 
-        zSensitivitySeekBar.setEnabled(preferences.getBoolean("zSeekBar", false));
-        zSensitivitySeekBar.setProgress(preferences.getInt("zProgress", ((MainActivity)getActivity()).getzCoordinationSensitivity()));
-        zValue.setText(String.valueOf(preferences.getInt("zProgress", ((MainActivity)getActivity()).getzCoordinationSensitivity())));
-        zDefaultButton.setEnabled(preferences.getBoolean("zDefButton", false));
-
         skippedSongSwitch.setChecked(preferences.getBoolean("skippedSong", false));
-        clearWeekSkipButton.setEnabled(preferences.getBoolean("clearWeekButton", false));
-        clearTotalSkipButton.setEnabled(preferences.getBoolean("clearTotalButton", false));
+        clearWeekSkipButton.setEnabled(preferences.getBoolean("skippedSong", false));
+        clearTotalSkipButton.setEnabled(preferences.getBoolean("skippedSong", false));
         weekSkipSeekBar.setEnabled(preferences.getBoolean("skippedSong", false));
-        weekSkipSeekBar.setProgress(preferences.getInt("weekSkip", ((MainActivity)getActivity()).getCountForDelWeek()));
+        weekSkipSeekBar.setProgress(preferences.getInt("countWeek", defaultSkipWeek));
         totalSkipSeekBar.setEnabled(preferences.getBoolean("skippedSong", false));
-        weekSkipSeekBar.setProgress(preferences.getInt("totalSkip", ((MainActivity)getActivity()).getCountForDelTotal()));
-        weekSkipValueTextView.setText(String.valueOf(preferences.getInt("countWeek",((MainActivity)getActivity()).getCountForDelWeek())));
-        totalSkipValueTextView.setText(String.valueOf(preferences.getInt("countTotal",((MainActivity)getActivity()).getCountForDelTotal())));
+        totalSkipSeekBar.setProgress(preferences.getInt("countTotal", defaultSkipTotal));
+        weekSkipValueTextView.setText(String.valueOf(preferences.getInt("countWeek",defaultSkipWeek)));
+        totalSkipValueTextView.setText(String.valueOf(preferences.getInt("countTotal",defaultSkipTotal)));
+        countForDelTotal = preferences.getInt("countTotal", defaultSkipTotal);
+        countForDelWeek = preferences.getInt("countWeek", defaultSkipWeek);
+
+        xCoordinationSensitivity = preferences.getInt("xProgress", defaultSensitivity);
+        yCoordinationSensitivity = preferences.getInt("yProgress", defaultSensitivity);
+        useMotionControl = preferences.getBoolean("motionControl", false);
+        skippedSong = preferences.getBoolean("skipped", false);
 
         motionControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                ((MainActivity)getActivity()).setUseMotionControl(true);
+                useMotionControl = motionControlSwitch.isChecked();
+                ((MainActivity)getActivity()).setUseMotionControl(useMotionControl);
                 if ( motionControlSwitch.isChecked()){
                     xSensitivitySeekBar.setEnabled(true);
                     xDefaultButton.setEnabled(true);
                     ySensitivitySeekBar.setEnabled(true);
                     yDefaultButton.setEnabled(true);
-                    zSensitivitySeekBar.setEnabled(true);
-                    zDefaultButton.setEnabled(true);
                     editor.putBoolean("xSeekBar", xSensitivitySeekBar.isEnabled());
                     editor.putBoolean("xDefButton", xDefaultButton.isEnabled());
                     editor.putBoolean("ySeekBar", ySensitivitySeekBar.isEnabled());
                     editor.putBoolean("yDefButton", yDefaultButton.isEnabled());
-                    editor.putBoolean("zSeekBar", zSensitivitySeekBar.isEnabled());
-                    editor.putBoolean("zDefButton", zDefaultButton.isEnabled());
                     editor.commit();
                 } else {
                     xSensitivitySeekBar.setEnabled(false);
                     xDefaultButton.setEnabled(false);
                     ySensitivitySeekBar.setEnabled(false);
                     yDefaultButton.setEnabled(false);
-                    zSensitivitySeekBar.setEnabled(false);
-                    zDefaultButton.setEnabled(false);
                     editor.putBoolean("xSeekBar", xSensitivitySeekBar.isEnabled());
                     editor.putBoolean("xDefButton", xDefaultButton.isEnabled());
                     editor.putBoolean("ySeekBar", ySensitivitySeekBar.isEnabled());
                     editor.putBoolean("yDefButton", yDefaultButton.isEnabled());
-                    editor.putBoolean("zSeekBar", zSensitivitySeekBar.isEnabled());
-                    editor.putBoolean("zDefButton", zDefaultButton.isEnabled());
                     editor.commit();
                 }
-                editor.putBoolean("motionControl", motionControlSwitch.isChecked());
+                editor.putBoolean("motionControl", useMotionControl);
                 editor.commit();
             }
         });
@@ -143,9 +142,10 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 if (fromUser) {
-                    xValue.setText(String.valueOf(seekBar.getProgress()));
-                    ((MainActivity)getActivity()).setxCoordinationSensitivity(seekBar.getProgress());
-                    editor.putInt("xProgress", seekBar.getProgress());
+                    xCoordinationSensitivity = seekBar.getProgress() + 3;
+                    ((MainActivity)getActivity()).setxCoordinationSensitivity(xCoordinationSensitivity);
+                    xValue.setText(String.valueOf(seekBar.getProgress()+ 3));
+                    editor.putInt("xProgress", xCoordinationSensitivity);
                     editor.commit();
                 }
             }
@@ -163,29 +163,10 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 if (fromUser) {
-                    yValue.setText(String.valueOf(seekBar.getProgress()));
-                    ((MainActivity)getActivity()).setyCoordinationSensitivity(seekBar.getProgress());
-                    editor.putInt("yProgress", seekBar.getProgress());
-                    editor.commit();
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-
-        zSensitivitySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
-                if (fromUser){
-                    zValue.setText(String.valueOf(seekBar.getProgress()));
-                    ((MainActivity)getActivity()).setzCoordinationSensitivity(seekBar.getProgress());
-                    editor.putInt("zProgress", seekBar.getProgress());
+                    yCoordinationSensitivity = seekBar.getProgress() + 3;
+                    ((MainActivity)getActivity()).setyCoordinationSensitivity(yCoordinationSensitivity);
+                    yValue.setText(String.valueOf(seekBar.getProgress() + 3));
+                    editor.putInt("yProgress", yCoordinationSensitivity);
                     editor.commit();
                 }
             }
@@ -205,9 +186,11 @@ public class SettingsFragment extends Fragment {
         xDefaultButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xValue.setText(String.valueOf(((MainActivity)getActivity()).getxCoordinationSensitivity()));
-                ((MainActivity)getActivity()).setxCoordinationSensitivity(18);
-                xSensitivitySeekBar.setProgress(((MainActivity)getActivity()).getxCoordinationSensitivity());
+                xValue.setText(String.valueOf(defaultSensitivity));
+                xSensitivitySeekBar.setProgress(defaultSensitivity);
+                xCoordinationSensitivity = defaultSensitivity;
+                ((MainActivity)getActivity()).setxCoordinationSensitivity(xCoordinationSensitivity);
+                editor.putInt("xProgress", xCoordinationSensitivity);
                 editor.putBoolean("xDefButton", xDefaultButton.isEnabled());
                 editor.commit();
             }
@@ -219,32 +202,34 @@ public class SettingsFragment extends Fragment {
         yDefaultButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                yValue.setText(String.valueOf(((MainActivity)getActivity()).getyCoordinationSensitivity()));
-                ((MainActivity)getActivity()).setyCoordinationSensitivity(18);
-                ySensitivitySeekBar.setProgress(((MainActivity)getActivity()).getyCoordinationSensitivity());
+                yValue.setText(String.valueOf(defaultSensitivity));
+                ySensitivitySeekBar.setProgress(defaultSensitivity);
+                yCoordinationSensitivity = defaultSensitivity;
+                ((MainActivity)getActivity()).setyCoordinationSensitivity(yCoordinationSensitivity);
+                editor.putInt("yProgress", yCoordinationSensitivity);
                 editor.putBoolean("yDefButton", yDefaultButton.isEnabled());
                 editor.commit();
             }
         });
 
-        /**
-         * set default sensitivity for z axis
-         */
-        zDefaultButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                zValue.setText(String.valueOf(((MainActivity)getActivity()).getzCoordinationSensitivity()));
-                ((MainActivity)getActivity()).setzCoordinationSensitivity(18);
-                zSensitivitySeekBar.setProgress(((MainActivity)getActivity()).getzCoordinationSensitivity());
-                editor.putBoolean("zDefButton", zDefaultButton.isEnabled());
-                editor.commit();
-            }
-        });
 
         skippedSongSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                ((MainActivity)getActivity()).setSkippedSong(skippedSongSwitch.isChecked());
+                skippedSong = skippedSongSwitch.isChecked();
+                if (!skippedSongSwitch.isChecked() && alarmManager != null) {
+                    alarmManager.cancel(pendingIntent);
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                    alarmManager = (AlarmManager) getActivity().getSystemService(getContext().ALARM_SERVICE);
+                    Intent myIntent = new Intent(getContext(), DatabaseCleanService.class);
+                    pendingIntent = PendingIntent.getService(getContext(), 0, myIntent, 0);
+                    //call clear after one week for first time
+                    alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis() + (1000*60*60*24*7),1000*60*60*24*7, pendingIntent);
+                }
+                editor.putBoolean("skippedSong", skippedSong);
                 if (skippedSongSwitch.isChecked()){
                     clearTotalSkipButton.setEnabled(true);
                     clearWeekSkipButton.setEnabled(true);
@@ -262,10 +247,8 @@ public class SettingsFragment extends Fragment {
                     editor.putBoolean("clearTotalButton", clearTotalSkipButton.isEnabled());
                     editor.commit();
                 }
-                editor.putBoolean("skippedSong", skippedSongSwitch.isChecked());
                 editor.commit();
-
-
+                ((MainActivity)getActivity()).setSkippedSong(skippedSong);
             }
         });
         clearTotalSkipButton.setOnClickListener(new View.OnClickListener() {
@@ -286,8 +269,9 @@ public class SettingsFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser){
                     weekSkipValueTextView.setText(String.valueOf(progress));
-                    ((MainActivity)getActivity()).setCountForDelWeek(progress);
-                    editor.putInt("countWeek", progress);
+                    countForDelWeek = progress;
+                    ((MainActivity)getActivity()).setCountForDelWeek(countForDelWeek);
+                    editor.putInt("countWeek", countForDelWeek);
                     editor.commit();
                 }
             }
@@ -306,8 +290,9 @@ public class SettingsFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     totalSkipValueTextView.setText(String.valueOf(progress));
-                    ((MainActivity)getActivity()).setCountForDelTotal(progress);
-                    editor.putInt("countTotal", progress);
+                    countForDelTotal = progress;
+                    ((MainActivity)getActivity()).setCountForDelTotal(countForDelTotal);
+                    editor.putInt("countTotal", countForDelTotal);
                     editor.commit();
                 }
             }
@@ -332,5 +317,19 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    public boolean isUseMotionControl() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        useMotionControl = preferences.getBoolean("motionControl", false);
+        return useMotionControl;
+    }
+
+    public int getCountForDelTotal() {
+        return countForDelTotal;
+    }
+
+    public int getCountForDelWeek() {
+        return countForDelWeek;
     }
 }

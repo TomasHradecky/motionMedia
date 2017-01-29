@@ -66,21 +66,21 @@
     </item>
     <item
         is-multidex="true"
-        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="4243f850ce3966b47621b34979ba78c079ba7644">
-        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_661eb7ef580e88bd764c47a676aee56238ca3c37\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="675848ca62bc35942b7cfa3938384cc2a9a8126b">
+        sha1="fb9e16adb3720b609ae18983a1ca55a4efc9cf95">
         <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_55e460fd762c8f86b7d72c3271f2de59fec708e6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="777ed9acd8ba28fdc5551e6ae5c134584ce166bf">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_661eb7ef580e88bd764c47a676aee56238ca3c37\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -144,6 +144,15 @@
         revision="25.0.0"
         sha1="d5c731fc64c03dfe04d51134955b483551c35849">
         <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-24.2.1_aa60296e2e826c6b3721004b0b7f838055a24783\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Tomas\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.8.0\c4ba5371a29ac9b2ad6129b1d39ea38750043eff\gson-2.8.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="c4ba5371a29ac9b2ad6129b1d39ea38750043eff">
+        <dex dex="D:\ANDROID_APPLICATIONS\MotionMedia\app\build\intermediates\transforms\dex\debug\folders\1000\10\gson-2.8.0_849a7b1ae14f3e18627f758ed6bee71e13933548\classes.dex" />
     </item>
     <item
         is-multidex="true"

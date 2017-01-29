@@ -1,4 +1,10 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragmentSettings"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragmentHelp"
     android:layout_width="match_parent"
@@ -7,21 +13,6 @@
 
 
     <TextView
-        android:text="Motion media"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="19dp"
-        android:id="@+id/titleTextView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="18sp" />
-
-    <TextView
-        android:text="tady bude popis aplikace a ovladani"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/titleTextView"
@@ -30,4 +21,29 @@
         android:layout_marginTop="15dp"
         android:id="@+id/helpTextView" />
 
+    <ImageView
+        app:srcCompat="@drawable/phone"
+        android:id="@+id/phoneImageView"
+        android:layout_width="300px"
+        android:layout_height="350px"
+        android:layout_below="@+id/helpTextView"
+        android:layout_alignLeft="@+id/helpTextView"
+        android:layout_alignStart="@+id/helpTextView"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:text="Welcome in MotionMedia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="19dp"
+        android:id="@+id/titleTextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
+</ScrollView>

@@ -8,6 +8,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -85,12 +87,18 @@ public class ExpandableSongListAdapter extends BaseExpandableListAdapter {
             view = inflater.inflate(R.layout.song_list_item, null);
         }
         child = (ArrayList<Song>) songList.get(groupPosition);
+        Collections.sort(this.child, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongName().compareToIgnoreCase(o2.getSongName());
+            }
+        });
         TextView song = (TextView) view.findViewById(R.id.songNametextView);
         TextView artist = (TextView) view.findViewById(R.id.artistNametextView);
         artist.setVisibility(View.GONE);
         song.setMaxLines(1);
         song.setTextSize(18);
-        song.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 60));
+        song.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 80));
         song.setText("      - " + child.get(childPosition).getSongName());
         return view;
     }

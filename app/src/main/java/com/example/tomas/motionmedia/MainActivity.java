@@ -5,7 +5,6 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, MainActivityFragment.GoOnSongListListener, MainActivityFragment.GoOnSettingsListener, MainActivityFragment.GoOnHelpListener, SongListFragment.GoOnMainListener{
@@ -29,9 +30,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private List<Song> songForDel = new ArrayList<>();
     private Song currentSong;
     private int currentSongIndex, currentArtistIndex;
-    private int xCoordinationSensitivity = 18, yCoordinationSensitivity = 18, zCoordinationSensitivity = 18;
-    private int countForDelTotal = 10, countForDelWeek = 5;
+    private int xCoordinationSensitivity, yCoordinationSensitivity;
+    private int countForDelTotal, countForDelWeek;
+    private int defaultSensitivity = 5, defaultSkipWeek = 5, defaultSkipTotal = 10;
     private boolean useMotionControl, skippedSong, songsLoaded = false;
+    private SharedPreferences preferences = null;
     private SharedPreferences.Editor editor = null;
 
     @Override
@@ -40,9 +43,16 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
         songsLoaded = preferences.getBoolean("songsLoaded", false);
+        xCoordinationSensitivity = preferences.getInt("xSens", defaultSensitivity);
+        yCoordinationSensitivity = preferences.getInt("ySens", defaultSensitivity);
+        countForDelWeek = preferences.getInt("skipWeek", defaultSkipWeek);
+        countForDelTotal = preferences.getInt("skippedTotal", defaultSkipTotal);
+        useMotionControl = preferences.getBoolean("useMotion", false);
+        skippedSong = preferences.getBoolean("skipped", false);
+        setActualPlaylist(db.getPlaylistSongs());
 
         if (!songsLoaded) {
             new SongLoader().execute();
@@ -73,7 +83,21 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
             return true;
         } else if (id == R.id.action_refresh){
             try {
+                Toast.makeText(getApplicationContext(), "Wait until refresh will be completed", Toast.LENGTH_LONG).show();
                 refreshSongs();
+                songListFragment.setActualPlayList(actualPlaylist);
+                songListFragment.getActualSongListView().setAdapter(new SongListAdapter(this, actualPlaylist));
+                songListFragment.getActualSongListView().invalidateViews();
+
+                songListFragment.setAllSongList(allSongList);
+                songListFragment.getAllSongListView().setAdapter(new SongListAdapter(this, allSongList));
+                songListFragment.getAllSongListView().invalidateViews();
+
+                songListFragment.setArtistList(artistList);
+                songListFragment.setObjectSongList(objectSongList);
+                songListFragment.getExpListView().setAdapter(new ExpandableSongListAdapter(this, objectSongList, artistList));
+                songListFragment.getExpListView().invalidateViews();
+
                 Toast.makeText(getApplicationContext(), "List of songs in your device was actualized", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -97,32 +121,34 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         objectSongList = songsManager.getObjectSongList(getApplicationContext());
         artistList = songsManager.getArtistsList();
         allSongList = songsManager.getAllSongList();
+        actualPlaylist = db.getPlaylistSongs();
         songForDel = db.getSongsForDel(countForDelTotal, countForDelWeek);
         db.clearSongs();
         db.saveSongs(allSongList);
-        Toast.makeText(this, "Song list refreshed", Toast.LENGTH_SHORT);
-    }
-
-    public void reloadFragment (Fragment frg) {
-        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.detach(frg);
-        ft.commit();
-        ft.attach(frg);
-        ft.commit();
     }
 
     private class SongLoader extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
-
             objectSongList = songsManager.getObjectSongList(getApplicationContext());
             artistList = songsManager.getArtistsList();
             allSongList = songsManager.getAllSongList();
+            actualPlaylist = db.getPlaylistSongs();
             db.saveSongs(allSongList);
             songsLoaded = true;
             editor.putBoolean("songsLoaded", songsLoaded);
             editor.commit();
+            return "Executed";
+        }
+    }
+
+    private class PlaylistSaver extends AsyncTask<List<Song>, Void, String> {
+
+        @Override
+        protected String doInBackground(List<Song>... playList) {
+            db.clearPlaylistSongs();
+            db.markPlaylistSongs(playList[0]);
             return "Executed";
         }
     }
@@ -143,8 +169,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         mainFragment.setPlayList(playList);
-        mainFragment.setAnotherSong(playList.indexOf(song));
-        mainFragment.play(song.getSongPath());
+        new PlaylistSaver().execute(playList);
+        mainFragment.setCurrentSong(song);
+        mainFragment.setAnotherSong(song);
+        int i = playList.indexOf(song);
+        mainFragment.setCurrentSongIndex(i);
     }
     public void goOnSettings () {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -160,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
             objectSongList = songsManager.getObjectSongList(getApplicationContext());
             artistList = songsManager.getArtistsList();
             allSongList = songsManager.getAllSongList();
+            actualPlaylist = db.getPlaylistSongs();
         }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -173,16 +203,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         return artistList;
     }
 
-    public void setArtistList(List<String> artistList) {
-        this.artistList = artistList;
-    }
-
     public List<Object> getObjectSongList() {
         return objectSongList;
-    }
-
-    public void setObjectSongList(List<Object> objectSongList) {
-        this.objectSongList = objectSongList;
     }
 
     public List<Song> getActualPlaylist() {
@@ -190,6 +212,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     }
 
     public void setActualPlaylist(List<Song> actualPlaylist) {
+        Collections.sort(actualPlaylist, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongName().compareToIgnoreCase(o2.getSongName());
+            }
+        });
         this.actualPlaylist = actualPlaylist;
     }
 
@@ -197,20 +225,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         return allSongList;
     }
 
-    public void setAllSongList(List<Song> allSongList) {
-        this.allSongList = allSongList;
-    }
-
-    public Song getCurrentSong() {
-        return currentSong;
-    }
-
     public void setCurrentSong(Song currentSong) {
         this.currentSong = currentSong;
-    }
-
-    public int getCurrentSongIndex() {
-        return currentSongIndex;
     }
 
     public void setCurrentSongIndex(int currentSongIndex) {
@@ -218,43 +234,47 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     }
 
     public boolean isUseMotionControl() {
+        useMotionControl = preferences.getBoolean("useMotion", false);
         return useMotionControl;
     }
 
-    public void setUseMotionControl(boolean useMotionControl) {
+    public void setUseMotionControl(boolean useMotionControl){
         this.useMotionControl = useMotionControl;
+        editor.putBoolean("useMotion", useMotionControl);
+        editor.commit();
     }
 
     public int getxCoordinationSensitivity() {
+        xCoordinationSensitivity = preferences.getInt("xSens", defaultSensitivity);
         return xCoordinationSensitivity;
     }
 
     public void setxCoordinationSensitivity(int xCoordinationSensitivity) {
         this.xCoordinationSensitivity = xCoordinationSensitivity;
+        editor.putInt("xSens", xCoordinationSensitivity);
+        editor.commit();
     }
 
     public int getyCoordinationSensitivity() {
+        xCoordinationSensitivity = preferences.getInt("ySens", defaultSensitivity);
         return yCoordinationSensitivity;
     }
 
     public void setyCoordinationSensitivity(int yCoordinationSensitivity) {
         this.yCoordinationSensitivity = yCoordinationSensitivity;
-    }
-
-    public int getzCoordinationSensitivity() {
-        return zCoordinationSensitivity;
-    }
-
-    public void setzCoordinationSensitivity(int zCoordinationSensitivity) {
-        this.zCoordinationSensitivity = zCoordinationSensitivity;
+        editor.putInt("ySens", yCoordinationSensitivity);
+        editor.commit();
     }
 
     public boolean isSkippedSong() {
+        skippedSong = preferences.getBoolean("skipped", false);
         return skippedSong;
     }
 
     public void setSkippedSong(boolean skippedSong) {
         this.skippedSong = skippedSong;
+        editor.putBoolean("skipped", skippedSong);
+        editor.commit();
     }
 
     public int getCurrentArtistIndex() {
@@ -269,43 +289,44 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         return db;
     }
 
-    public void setDb(Database db) {
-        this.db = db;
-    }
-
     public SongListFragment getSongListFragment() {
         return songListFragment;
     }
 
-    public List<Song> getSongForDel() {
-        return songForDel;
-    }
-
-    public void setSongForDel(List<Song> songForDel) {
-        this.songForDel = songForDel;
-    }
-
     public boolean isSongsLoaded() {
+        songsLoaded = preferences.getBoolean("songsLoaded", false);
         return songsLoaded;
     }
 
-    public void setSongsLoaded(boolean songsLoaded) {
-        this.songsLoaded = songsLoaded;
-    }
-
     public int getCountForDelWeek() {
+        countForDelTotal = preferences.getInt("skipWeek", defaultSkipWeek);
         return countForDelWeek;
     }
 
     public void setCountForDelWeek(int countForDelWeek) {
         this.countForDelWeek = countForDelWeek;
+        editor = preferences.edit();
+        editor.putInt("skipWeek", countForDelWeek);
+        editor.commit();
     }
 
     public int getCountForDelTotal() {
+        countForDelTotal = preferences.getInt("skipTotal", defaultSkipTotal);
         return countForDelTotal;
     }
 
     public void setCountForDelTotal(int countForDelTotal) {
         this.countForDelTotal = countForDelTotal;
+        editor = preferences.edit();
+        editor.putInt("skipTotal", countForDelTotal);
+        editor.commit();
+    }
+
+    public MainActivityFragment getMainFragment() {
+        return mainFragment;
+    }
+
+    public SettingsFragment getSettingsFragment() {
+        return settingsFragment;
     }
 }

@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:textSize="10pt"
-        android:text="No song name"
+        android:text="No currentSong name"
         android:id="@+id/topItemNametextView"
         tools:lines="1"
         android:layout_marginLeft="30dp"

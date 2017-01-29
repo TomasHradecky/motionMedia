@@ -11,11 +11,10 @@ import java.util.List;
 
 /**
  * Created by Tomas Hradecky on 25.10.2016.
- * Class for searching mp3 files in device.
+ * Class for searching audio files in device from android mediaStore library .
  */
 public class SongsManager {
 
-    // SDCard Path
     private List<Song> allSongList = new ArrayList<Song>();
     private List<Object> objectSongList = new ArrayList<>();
     private List<String> artistList = new ArrayList<>();
@@ -36,11 +35,11 @@ public class SongsManager {
             Cursor cur = context.getContentResolver().query( MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
             if (cur == null) {
                 // Query failed...
-                //Log.e(TAG, "Failed to retrieve music: cursor is null :-(");
+                Log.e(TAG, "Failed to retrieve music: cursor is null :-(");
             }
             else if (!cur.moveToFirst()) {
                 // Nothing to query. There is no music on the device. How boring.
-                //Log.e(TAG, "Failed to move cursor to first row (no query results).");
+                Log.e(TAG, "Failed to move cursor to first row (no query results).");
             }else {
                // Log.i(TAG, "Listing...");
                 // retrieve the indices of the columns where the ID, title, etc. of the song are
@@ -89,10 +88,14 @@ public class SongsManager {
             }
         });
 
+        allSongList = sortAllSongList();
+        allSongList = getAllSongList();
+        artistList = sortArtistList();
+        artistList = getArtistsList();
         return objectSongList;
     }
 
-    public List<String> getArtistsList (){
+    public List<String> sortArtistList () {
         Collections.sort(artistList, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -102,13 +105,20 @@ public class SongsManager {
         return artistList;
     }
 
-    public List<Song> getAllSongList() {
+    public List<String> getArtistsList (){
+        return artistList;
+    }
+
+    public List<Song> sortAllSongList () {
         Collections.sort(allSongList, new Comparator<Song>() {
             @Override
             public int compare(Song o1, Song o2) {
                 return o1.getSongName().compareToIgnoreCase(o2.getSongName());
             }
         });
+        return allSongList;
+    }
 
+    public List<Song> getAllSongList() {
         return allSongList; }
 }

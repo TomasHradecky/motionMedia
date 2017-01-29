@@ -2,18 +2,18 @@ package com.example.tomas.motionmedia;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
+ * Created by Tomas Hradecky
  * Custom song list adapter for view row with song name and song artist
  */
 public class SongListAdapter extends BaseAdapter {
@@ -23,7 +23,15 @@ public class SongListAdapter extends BaseAdapter {
 
     public SongListAdapter (Context context, List<Song> songList ) {
         this.context = context;
+        Collections.sort(songList, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongName().compareToIgnoreCase(o2.getSongName());
+            }
+        });
+
         this.songList = songList;
+
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -51,8 +59,14 @@ public class SongListAdapter extends BaseAdapter {
         }
         TextView songName = (TextView) view.findViewById(R.id.songNametextView);
         TextView songArtist = (TextView) view.findViewById(R.id.artistNametextView);
-
-        songName.setText(songList.get(position).getSongName());
+        String name;
+        if(songList.get(position).getSongName().startsWith("'")){
+            name = songList.get(position).getSongName();
+            name = name.substring(1, name.length()-1);
+        } else {
+            name = songList.get(position).getSongName();
+        }
+        songName.setText(name);
         songName.setMaxLines(1);
         songName.setTextSize(18);
         songName.setBackgroundColor(Color.rgb(189,189,189));
