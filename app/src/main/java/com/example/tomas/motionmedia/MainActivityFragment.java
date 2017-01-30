@@ -691,52 +691,52 @@ public class MainActivityFragment extends Fragment implements SensorEventListene
                      * if average is positive then all values in field are declared as positive and average is recalculate, similarly for negative average
                      */
                     //calculate average value of x speed
-                    for (int i = 0; i < xDataList.length - 1; i++){
+                    for (int i = 0; i < xDataList.length; i++){
                         avgX = avgX + xDataList[i];
                     }
                     avgX = avgX / xDataList.length;
                     if (avgX > 0){
                         avgX = 0;
-                        for (int i = 0; i < xDataList.length - 1; i++){
+                        for (int i = 0; i < xDataList.length; i++){
                             float tmp = Math.abs(xDataList[i]);
                             avgX = avgX + tmp;
                         }
                         avgX = avgX / 4;
                     } else {
                         avgX = 0;
-                        for (int i = 0; i < xDataList.length - 1; i++){
+                        for (int i = 0; i < xDataList.length; i++){
                             float tmp = Math.abs(xDataList[i]);
                             avgX = avgX - tmp;
                         }
                         avgX = avgX / 4;
                     }
                     //calculate average value of y speed
-                    for (int i = 0; i < yDataList.length - 1; i++){
+                    for (int i = 0; i < yDataList.length; i++){
                         avgY = avgY + yDataList[i];
                     }
                     avgY = avgY / yDataList.length;
                     if (avgY > 0){
                         avgY = 0;
-                        for (int i = 0; i < yDataList.length - 1; i++){
+                        for (int i = 0; i < yDataList.length; i++){
                             float tmp = Math.abs(yDataList[i]);
                             avgY = avgY + tmp;
                         }
                         avgY = avgY / 4;
                     } else {
                         avgY = 0;
-                        for (int i = 0; i < yDataList.length - 1; i++){
+                        for (int i = 0; i < yDataList.length; i++){
                             float tmp = Math.abs(yDataList[i]);
                             avgY = avgY - tmp;
                         }
                         avgY = avgY / 4;
                     }
                     //calculate average value of x delta speed
-                    for (int i = 0; i < xDeltaList.length -1; i++){
+                    for (int i = 0; i < xDeltaList.length; i++){
                         avgDeltaX = avgDeltaX + xDeltaList[i];
                     }
                     avgDeltaX = avgDeltaX / 2;
                     //calculate average value of y delta speed
-                    for (int i = 0; i < yDeltaList.length -1; i++){
+                    for (int i = 0; i < yDeltaList.length ; i++){
                         avgDeltaY = avgDeltaY + yDeltaList[i];
                     }
                     avgDeltaY = avgDeltaY / 2;
